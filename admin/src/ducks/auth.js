@@ -10,6 +10,7 @@ const prefix = `${appName}/${moduleName}`
 
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
 export const SIGN_UP_SUCCESS = `${prefix}/SIGN_UP_SUCCESS`
+export const SIGN_OUT_SUCCESS = `${prefix}/SIGN_OUT_SUCCESS`
 
 /**
  * Reducer
@@ -25,6 +26,8 @@ export default function reducer(state = new ReducerRecord(), action) {
     case SIGN_UP_SUCCESS:
     case SIGN_IN_SUCCESS:
       return state.set('user', payload.user)
+    case SIGN_OUT_SUCCESS:
+      return state.set('user', null)
 
     default:
       return state
@@ -62,6 +65,19 @@ export function signIn(email, password) {
         dispatch({
           type: SIGN_IN_SUCCESS,
           payload: { user }
+        })
+      )
+  }
+}
+
+export function signOut() {
+  return (dispatch) => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() =>
+        dispatch({
+          type: SIGN_OUT_SUCCESS
         })
       )
   }
