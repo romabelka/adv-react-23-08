@@ -32,6 +32,17 @@ export default function reducer(state = new ReducerList(), action) {
   }
 }
 
+export const cleanForm = {
+  person: (state, action) => {
+    switch (action.type) {
+      case CREATE_PERSON:
+        return undefined
+      default:
+        return state
+    }
+  }
+}
+
 /**
  * Selectors
  * */
