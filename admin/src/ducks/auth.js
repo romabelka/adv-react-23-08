@@ -51,9 +51,7 @@ export function signUp(email, password) {
           payload: { user }
         })
       )
-      .catch((error) => {
-        dispatch(apiError(error))
-      })
+      .catch((error) => dispatch(apiError(error)))
   }
 }
 
@@ -68,6 +66,7 @@ export function signIn(email, password) {
           payload: { user }
         })
       )
+      .catch((error) => dispatch(apiError(error)))
   }
 }
 
