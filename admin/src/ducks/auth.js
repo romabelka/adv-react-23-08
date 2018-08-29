@@ -7,6 +7,7 @@ import { apiError } from './error'
  * Constants
  * */
 export const moduleName = 'auth'
+
 const prefix = `${appName}/${moduleName}`
 
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`

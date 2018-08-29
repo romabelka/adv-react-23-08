@@ -1,5 +1,6 @@
 import { appName } from '../config'
 import { Record } from 'immutable'
+import { LOCATION_CHANGE } from 'connected-react-router'
 
 /**
  * Constants
@@ -22,7 +23,18 @@ export default function reducer(state = new ErrorRecord(), action) {
 
   switch (type) {
     case API_FAILURE:
-      return state.set('message', payload.message).set('stack', payload.stack)
+      const { message, stack } = payload
+      return state.merge({ message, stack })
+
+    case LOCATION_CHANGE:
+      if (payload.location.state) {
+        const redirectError = payload.location.state.error
+        if (redirectError) {
+          const { message, stack } = redirectError
+          return state.merge({ message, stack })
+        }
+      }
+      return state.merge({ message: null, stack: null })
 
     default:
       return state
