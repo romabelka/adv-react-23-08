@@ -66,3 +66,10 @@ export function signIn(email, password) {
       )
   }
 }
+
+firebase.auth().onAuthStateChanged((user) => {
+  window.store.dispatch({
+    type: SIGN_IN_SUCCESS,
+    payload: { user }
+  })
+})
