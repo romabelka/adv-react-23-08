@@ -13,7 +13,7 @@ class SignInForm extends Component {
             Email: <Field name="email" component="input" />
           </div>
           <div>
-            Password:{' '}
+            Password:
             <Field
               name="password"
               component="input"

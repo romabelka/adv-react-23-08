@@ -9,7 +9,9 @@ export const moduleName = 'auth'
 const prefix = `${appName}/${moduleName}`
 
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
+export const SIGN_IN_FAILURE = `${prefix}/SIGN_IN_FAILURE`
 export const SIGN_UP_SUCCESS = `${prefix}/SIGN_UP_SUCCESS`
+export const SIGN_UP_FAILURE = `${prefix}/SIGN_UP_FAILURE`
 
 /**
  * Reducer
@@ -44,11 +46,17 @@ export function signUp(email, password) {
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then((user) =>
-        dispatch({
-          type: SIGN_UP_SUCCESS,
-          payload: { user }
-        })
+      .then(
+        (user) =>
+          dispatch({
+            type: SIGN_UP_SUCCESS,
+            payload: { user }
+          }),
+        (user) =>
+          dispatch({
+            type: SIGN_UP_FAILURE,
+            payload: { user }
+          })
       )
   }
 }
@@ -58,11 +66,17 @@ export function signIn(email, password) {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then((user) =>
-        dispatch({
-          type: SIGN_IN_SUCCESS,
-          payload: { user }
-        })
+      .then(
+        (user) =>
+          dispatch({
+            type: SIGN_IN_SUCCESS,
+            payload: { user }
+          }),
+        (user) =>
+          dispatch({
+            type: SIGN_IN_FAILURE,
+            payload: { user }
+          })
       )
   }
 }
