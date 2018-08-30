@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react'
-import { Route, NavLink } from 'react-router-dom'
-import AuthRoute from './routes/auth'
-import AdminRoute from './routes/admin'
+import Routes from './routes'
+import { NavLink } from 'react-router-dom'
+import { connect } from 'react-redux'
 
-class App extends Component {
-  get menu() {
+class Menu extends Component {
+  render() {
     return (
       <Fragment>
         <div>
@@ -20,16 +20,25 @@ class App extends Component {
       </Fragment>
     )
   }
-  render() {
-    return (
-      <div>
-        <h1>Hello World</h1>
-        {this.menu}
-        <Route path="/admin" component={AdminRoute} />
-        <Route path="/auth" component={AuthRoute} />
-      </div>
-    )
+}
+
+const AppComponent = ({ auth, router }) => {
+  return (
+    <div>
+      <h1>Hello World</h1>
+      <Menu />
+      <Routes auth={auth} />
+    </div>
+  )
+}
+
+const mapStateToProps = (state, props) => {
+  return {
+    auth: state.auth,
+    router: state.router
   }
 }
+
+const App = connect(mapStateToProps)(AppComponent)
 
 export default App

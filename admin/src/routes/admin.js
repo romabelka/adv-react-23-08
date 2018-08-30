@@ -1,15 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-class AdminRoute extends Component {
-  static propTypes = {}
+import Users from '../components/users'
 
-  render() {
-    return (
-      <div>
-        <h2>Admin</h2>
-      </div>
-    )
-  }
-}
+const Admin = () => (
+  <div>
+    <Users />
+  </div>
+)
 
-export default AdminRoute
+export default Admin
