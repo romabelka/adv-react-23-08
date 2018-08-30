@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { authorizedRoute } from '../HOCs/authorizedRoute/authorizedRoute'
 
 class AdminRoute extends Component {
   static propTypes = {}
@@ -12,4 +13,4 @@ class AdminRoute extends Component {
   }
 }
 
-export default AdminRoute
+export default authorizedRoute(AdminRoute)

@@ -1,6 +1,7 @@
 import { appName } from '../config'
 import { Record } from 'immutable'
 import firebase from 'firebase/app'
+import { createSelector } from 'reselect'
 
 /**
  * Constants
@@ -15,7 +16,9 @@ export const SIGN_UP_SUCCESS = `${prefix}/SIGN_UP_SUCCESS`
  * Reducer
  * */
 export const ReducerRecord = Record({
-  user: null
+  user: null,
+  isAuthorized: false,
+  isInitialized: false
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -24,7 +27,10 @@ export default function reducer(state = new ReducerRecord(), action) {
   switch (type) {
     case SIGN_UP_SUCCESS:
     case SIGN_IN_SUCCESS:
-      return state.set('user', payload.user)
+      return state
+        .set('user', payload.user)
+        .set('isInitialized', true)
+        .set('isAuthorized', true)
 
     default:
       return state
@@ -34,6 +40,14 @@ export default function reducer(state = new ReducerRecord(), action) {
 /**
  * Selectors
  * */
+
+const getState = (state) => state[moduleName]
+export const getIsInitialized = createSelector(getState, (auth) =>
+  auth.get('isInitialized')
+)
+export const getIsAuthorized = createSelector(getState, (auth) =>
+  auth.get('isAuthorized')
+)
 
 /**
  * Action Creators
