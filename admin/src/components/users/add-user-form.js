@@ -25,12 +25,8 @@ const validate = ({ firstName, lastName, email }) => {
   const errors = {}
 
   if (!firstName) errors.firstName = 'First name is required field'
-  else if (/w+/gi.test(firstName))
-    errors.firstName = 'First name must contain only alphabetic symbols'
 
   if (!lastName) errors.lastName = 'Last name is required field'
-  else if (/w+/gi.test(lastName))
-    errors.lastName = 'Last name must contain only alphabetic symbols'
 
   if (!email) errors.email = 'Email is required field'
   else if (!emailValidator.validate(email)) errors.email = 'invalid email'
