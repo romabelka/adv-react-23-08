@@ -1,5 +1,6 @@
 import { appName } from '../config'
 import { Map } from 'immutable'
+import { reset } from 'redux-form'
 
 /**
  * Constants
@@ -29,6 +30,10 @@ export default function reducer(state = Map(), action) {
  * Selectors
  * */
 
+export function isSignedIn(state) {
+  return !!state.auth && !!state.auth.user
+}
+
 /**
  * Action Creators
  * */
@@ -43,5 +48,6 @@ export function addUser(email, firstName, lastName) {
         lastName
       }
     })
+    dispatch(reset('admin'))
   }
 }
