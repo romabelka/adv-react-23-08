@@ -32,4 +32,3 @@ const mapStateToProps = (state) => {
 }
 
 export default withRouter(connect(mapStateToProps)(ProtectedRoute))
-// export default ProtectedRoute
