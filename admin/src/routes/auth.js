@@ -3,7 +3,7 @@ import { NavLink, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 import SignInForm from '../components/auth/sign-in-form'
 import SignUpForm from '../components/auth/sign-up-form'
-import { signUp, signIn } from '../ducks/auth'
+import { signUp, signIn, addPerson } from '../ducks/auth'
 
 class AuthRoute extends Component {
   static propTypes = {}

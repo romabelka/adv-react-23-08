@@ -1,5 +1,6 @@
 import { appName } from '../config'
 import { Record } from 'immutable'
+import { Map, List } from 'immutable'
 import firebase from 'firebase/app'
 
 /**
