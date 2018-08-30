@@ -9,10 +9,10 @@ class AuthRoute extends Component {
   static propTypes = {}
 
   componentWillReceiveProps(nextProps) {
-    // if (this.props.isAuth !== nextProps.isAuth) {
-    //   console.warn('>>', this.props)
-    //   this.props.authStateChanged(nextProps.isAuth)
-    // }
+    if (this.props.isAuth !== nextProps.isAuth) {
+      console.warn('>>', nextProps.isAuth)
+      this.props.authStateChanged(nextProps.isAuth)
+    }
   }
 
   render() {
@@ -52,7 +52,7 @@ class AuthRoute extends Component {
 
 export default connect(
   (state) => ({
-    isAuth: !!state.auth.user
+    isAuth: state.auth.authorized
   }),
   { signUp, signIn }
 )(AuthRoute)

@@ -15,13 +15,18 @@ class App extends Component {
     const { isAuth } = this.state
     return (
       <Fragment>
-        {isAuth && (
+        {/* {isAuth && (
           <div>
             <NavLink to="/admin" activeStyle={{ color: 'red' }}>
               admin
             </NavLink>
           </div>
-        )}
+        )} */}
+        <div>
+          <NavLink to="/admin" activeStyle={{ color: 'red' }}>
+            admin
+          </NavLink>
+        </div>
         <div>
           <NavLink to="/auth" activeStyle={{ color: 'red' }}>
             auth
@@ -31,21 +36,25 @@ class App extends Component {
     )
   }
   render() {
-    const { authStateChanged } = this
+    const {
+      state: { isAuth },
+      authStateChanged
+    } = this
     return (
       <div>
         <h1>Hello World</h1>
         {this.menu}
-        <PrivateRoute
-          authenticated={this.state.isAuth}
+        {/* <PrivateRoute
+          authenticated={isAuth}
           path="/admin"
           component={AdminRoute}
-        />
-        {/* <Route path="/auth" component={AuthRoute } /> */}
-        <Route
+        /> */}
+        <Route path="/admin" component={AdminRoute} />
+        <Route path="/auth" component={AuthRoute} />
+        {/* <Route
           path="/auth"
           render={() => <AuthRoute authStateChanged={authStateChanged} />}
-        />
+        /> */}
       </div>
     )
   }

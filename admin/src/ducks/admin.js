@@ -1,5 +1,5 @@
 import { appName } from '../config'
-import { Map, List, Record } from 'immutable'
+import { List } from 'immutable'
 
 /**
  * Constants
