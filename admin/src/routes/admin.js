@@ -2,8 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import { moduleName as authModule } from '../ducks/auth'
-import { moduleName as usersModule } from '../ducks/users'
-import UserList from '../components/users/user-list'
+import UsersArea from '../components/users/users-area'
 
 class AdminRoute extends Component {
   static propTypes = {}
@@ -18,8 +17,7 @@ class AdminRoute extends Component {
       return (
         <Fragment>
           <h2>Admin</h2>
-          <h3>Users</h3>
-          <UserList users={this.props.users} />
+          <UsersArea />
         </Fragment>
       )
     } else {
@@ -37,7 +35,6 @@ class AdminRoute extends Component {
   }
 }
 
-export default connect(({ [authModule]: auth, [usersModule]: users }) => ({
-  currentUser: auth.user,
-  users
+export default connect(({ [authModule]: auth }) => ({
+  currentUser: auth.user
 }))(AdminRoute)
