@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-export const appName = 'adv-react-23-08'
+export const appName = 'adv-react-23-08-yv'
 
 const fbConfig = {
   apiKey: 'AIzaSyAlWpSCiLQOATDM2O869VEYBfT3kuDuxc0',
