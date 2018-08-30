@@ -4,12 +4,12 @@ import 'firebase/auth'
 export const appName = 'adv-react-23-08'
 
 const fbConfig = {
-  apiKey: 'AIzaSyAlWpSCiLQOATDM2O869VEYBfT3kuDuxc0',
-  authDomain: `${appName}.firebaseapp.com`,
-  databaseURL: `https://${appName}.firebaseio.com`,
-  projectId: appName,
-  storageBucket: `${appName}.appspot.com`,
-  messagingSenderId: '842367541781'
+  apiKey: 'AIzaSyDtTcf5Ps1O-MEUB-H_9XMU-cc-1eQDjTk',
+  authDomain: 'advreact-162ac.firebaseapp.com',
+  databaseURL: 'https://advreact-162ac.firebaseio.com',
+  projectId: 'advreact-162ac',
+  storageBucket: 'advreact-162ac.appspot.com',
+  messagingSenderId: '1072802030604'
 }
 
 firebase.initializeApp(fbConfig)

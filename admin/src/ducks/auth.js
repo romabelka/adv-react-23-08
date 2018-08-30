@@ -1,6 +1,7 @@
 import { appName } from '../config'
 import { Record } from 'immutable'
 import firebase from 'firebase/app'
+import { reset } from 'redux-form'
 
 /**
  * Constants
@@ -10,6 +11,7 @@ const prefix = `${appName}/${moduleName}`
 
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
 export const SIGN_UP_SUCCESS = `${prefix}/SIGN_UP_SUCCESS`
+export const SIGN_OUT_SUCCESS = `${prefix}/SIGN_OUT_SUCCESS`
 
 /**
  * Reducer
@@ -25,7 +27,8 @@ export default function reducer(state = new ReducerRecord(), action) {
     case SIGN_UP_SUCCESS:
     case SIGN_IN_SUCCESS:
       return state.set('user', payload.user)
-
+    case SIGN_OUT_SUCCESS:
+      return state.remove('user')
     default:
       return state
   }
@@ -58,18 +61,32 @@ export function signIn(email, password) {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then((user) =>
+      .then((user) => {
         dispatch({
           type: SIGN_IN_SUCCESS,
           payload: { user }
         })
-      )
+        dispatch(reset('auth'))
+      })
   }
 }
 
+export const signOut = () => (dispatch) => {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      //  debugger
+      //  dispatch({
+      //    type: SIGN_OUT_SUCCESS
+      //  })
+    })
+}
+
 firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  })
+  if (!user) {
+    window.store.dispatch({
+      type: SIGN_OUT_SUCCESS
+    })
+  }
 })
