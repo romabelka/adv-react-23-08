@@ -5,14 +5,14 @@ import AdminRoute from './routes/admin'
 import PrivateRoute from './routes/private'
 
 class App extends Component {
-  state = {
-    isAuth: false
-  }
+  // state = {
+  //   isAuth: false
+  // }
 
-  authStateChanged = (isAuth) => this.setState({ isAuth })
+  // authStateChanged = (isAuth) => this.setState({ isAuth })
 
   get menu() {
-    const { isAuth } = this.state
+    // const { isAuth } = this.state
     return (
       <Fragment>
         {/* {isAuth && (
@@ -36,10 +36,7 @@ class App extends Component {
     )
   }
   render() {
-    const {
-      state: { isAuth },
-      authStateChanged
-    } = this
+    // const { state: { isAuth }, authStateChanged } = this
     return (
       <div>
         <h1>Hello World</h1>
