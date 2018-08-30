@@ -1,12 +1,16 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import UserList from './user-list'
-import { moduleName as usersModule } from '../../ducks/users'
+import { moduleName as usersModule, addUser } from '../../ducks/users'
 import UserAddForm from './user-add-form'
 
 class UsersArea extends Component {
-  handleUserAdd = () => ({}) // TODO: dispatch action
-  emailExists = (email) => this.props.users.has(email)
+  handleUserAdd = ({ firstName, lastName, email }) =>
+    this.props.addUser({ firstName, lastName, email })
+  emailExists = (email) => {
+    console.log('users', this.props.users)
+    return this.props.users.has(email)
+  }
 
   render() {
     return (
@@ -27,4 +31,7 @@ class UsersArea extends Component {
   }
 }
 
-export default connect(({ [usersModule]: users }) => ({ users }))(UsersArea)
+export default connect(
+  ({ [usersModule]: users }) => ({ users }),
+  { addUser }
+)(UsersArea)

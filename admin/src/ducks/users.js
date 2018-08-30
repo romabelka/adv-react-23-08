@@ -55,3 +55,22 @@ export default function reducer(state = UsersOrderedMap, action) {
 ///
 /// Action Creators
 ///
+
+export function addUser({ firstName, lastName, email }) {
+  return { type: ADD_USER, payload: { firstName, lastName, email } }
+}
+
+///
+/// Redux Form plugins
+///
+
+export const userFormPlugin = {
+  user: (state, action) => {
+    switch (action.type) {
+      case ADD_USER:
+        return undefined // <--- blow away form data
+      default:
+        return state
+    }
+  }
+}
