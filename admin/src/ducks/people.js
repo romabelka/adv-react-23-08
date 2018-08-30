@@ -1,7 +1,7 @@
 import { appName } from '../config'
 import { Record } from 'immutable'
 import { List } from 'immutable'
-import firebase from 'firebase/app'
+import { reset } from 'redux-form'
 
 /**
  * Constants
@@ -23,7 +23,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
   switch (type) {
     case ADD_PERSON:
-      return state.people.push({
+      return state.people.set(state.people.size, {
         firstName: payload.firstName,
         lastName: payload.lastName,
         email: payload.email
@@ -43,9 +43,11 @@ export default function reducer(state = new ReducerRecord(), action) {
  * */
 
 export function addPerson(firstName, lastName, email) {
-  return (dispatch) =>
+  return (dispatch) => {
     dispatch({
       type: ADD_PERSON,
       payload: { firstName, lastName, email }
     })
+    dispatch(reset('people'))
+  }
 }
