@@ -8,6 +8,13 @@ import { signUp, signIn } from '../ducks/auth'
 class AuthRoute extends Component {
   static propTypes = {}
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isAuth !== nextProps.isAuth) {
+      console.warn('>>', nextProps.isAuth)
+      this.props.authStateChanged(nextProps.isAuth)
+    }
+  }
+
   render() {
     return (
       <div>
@@ -44,6 +51,8 @@ class AuthRoute extends Component {
 }
 
 export default connect(
-  null,
+  (state) => ({
+    isAuth: state.auth.authorized
+  }),
   { signUp, signIn }
 )(AuthRoute)
