@@ -13,7 +13,7 @@ class AddUserForm extends Component {
             First Name: <Field name="firstName" component="input" />
           </div>
           <div>
-            Second Name: <Field name="secondName" component="input" />
+            Second Name: <Field name="lastName" component="input" />
           </div>
           <div>
             Email: <Field name="email" component="input" />
@@ -26,5 +26,5 @@ class AddUserForm extends Component {
 }
 
 export default reduxForm({
-  form: 'admin'
+  form: 'people'
 })(AddUserForm)

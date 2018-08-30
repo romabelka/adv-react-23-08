@@ -5,7 +5,7 @@ import { reset } from 'redux-form'
 /**
  * Constants
  * */
-export const moduleName = 'admin'
+export const moduleName = 'people'
 const prefix = `${appName}/${moduleName}`
 
 export const ADD_USER_SUCCESS = `${prefix}/ADD_USER_SUCCESS`
@@ -34,11 +34,15 @@ export function isSignedIn(state) {
   return !!state.auth && !!state.auth.user
 }
 
+export function getUsers(state) {
+  return state.people
+}
+
 /**
  * Action Creators
  * */
 
-export function addUser(email, firstName, lastName) {
+export function addUser(firstName, lastName, email) {
   return (dispatch) => {
     dispatch({
       type: ADD_USER_SUCCESS,
@@ -48,6 +52,6 @@ export function addUser(email, firstName, lastName) {
         lastName
       }
     })
-    dispatch(reset('admin'))
+    dispatch(reset('people'))
   }
 }
