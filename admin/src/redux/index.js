@@ -4,10 +4,13 @@ import thunk from 'redux-thunk'
 import logger from 'redux-logger'
 import reducer from './reducer'
 import history from '../history'
+import { getAllUserAction } from '../ducks/user'
 
 const enhancer = applyMiddleware(thunk, routerMiddleware(history), logger)
 
 const store = createStore(connectRouter(history)(reducer), enhancer)
+
+store.dispatch(getAllUserAction())
 
 //dev only
 window.store = store
