@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import PrivateRoute from './components/common/privet-route'
 
 class App extends Component {
   get menu() {
@@ -25,7 +26,7 @@ class App extends Component {
       <div>
         <h1>Hello World</h1>
         {this.menu}
-        <Route path="/admin" component={AdminRoute} />
+        <PrivateRoute path="/admin" component={AdminRoute} />
         <Route path="/auth" component={AuthRoute} />
       </div>
     )
