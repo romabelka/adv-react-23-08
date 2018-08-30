@@ -28,7 +28,6 @@ export default function reducer(state = List(), action) {
 }
 
 export function formReducer(state, { type }) {
-  console.log('person form reduces', type, ADD_PERSON)
   switch (type) {
     case ADD_PERSON:
       return undefined
