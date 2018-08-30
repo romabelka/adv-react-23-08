@@ -2,16 +2,20 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import PersonForm from '../components/person/person-form'
+import PersonList from '../components/person/person-list'
 import { addPerson } from '../ducks/person'
 
 class PersonsRoute extends Component {
   static propTypes = {}
 
   render() {
+    const { data } = this.props
+
     return (
       <div>
         <h2>Persons</h2>
         <PersonForm onSubmit={this.handleSubmit} />
+        <PersonList data={data} />
       </div>
     )
   }
@@ -21,6 +25,6 @@ class PersonsRoute extends Component {
 }
 
 export default connect(
-  null,
+  (state) => ({ data: state.person }),
   { addPerson }
 )(PersonsRoute)
