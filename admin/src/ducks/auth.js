@@ -63,6 +63,7 @@ export function signIn(email, password) {
           type: SIGN_IN_SUCCESS,
           payload: { user }
         })
+
       )
   }
 }
