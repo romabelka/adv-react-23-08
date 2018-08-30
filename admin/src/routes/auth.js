@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { NavLink, Route } from 'react-router-dom'
+import { NavLink, Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import SignInForm from '../components/auth/sign-in-form'
 import SignUpForm from '../components/auth/sign-up-form'
@@ -9,6 +9,10 @@ class AuthRoute extends Component {
   static propTypes = {}
 
   render() {
+    return this.props.user ? this.redirectToAdmin : this.mainView
+  }
+
+  get mainView() {
     return (
       <div>
         <h2>Auth Page</h2>
@@ -17,6 +21,10 @@ class AuthRoute extends Component {
         <Route path="/auth/sign-up" render={this.signUpForm} />
       </div>
     )
+  }
+
+  get redirectToAdmin() {
+    return <Redirect to="/admin" />
   }
 
   get navMenu() {
@@ -44,6 +52,6 @@ class AuthRoute extends Component {
 }
 
 export default connect(
-  null,
+  (state) => ({ user: state.auth.user }),
   { signUp, signIn }
 )(AuthRoute)
