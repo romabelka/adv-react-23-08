@@ -8,7 +8,6 @@ class UsersArea extends Component {
   handleUserAdd = ({ firstName, lastName, email }) =>
     this.props.addUser({ firstName, lastName, email })
   emailExists = (email) => {
-    console.log('users', this.props.users)
     return this.props.users.has(email)
   }
 
