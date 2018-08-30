@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import UsersRoute from './routes/users'
 
 class App extends Component {
   get menu() {
@@ -17,6 +18,11 @@ class App extends Component {
             auth
           </NavLink>
         </div>
+        <div>
+          <NavLink to="/users" activeStyle={{ color: 'red' }}>
+            add users
+          </NavLink>
+        </div>
       </Fragment>
     )
   }
@@ -27,6 +33,7 @@ class App extends Component {
         {this.menu}
         <Route path="/admin" component={AdminRoute} />
         <Route path="/auth" component={AuthRoute} />
+        <Route path="/users" component={UsersRoute} />
       </div>
     )
   }
