@@ -13,6 +13,7 @@ class AuthRoute extends Component {
       <div>
         <h2>Auth Page</h2>
         {this.navMenu}
+
         <Route path="/auth/sign-in" render={this.signInForm} />
         <Route path="/auth/sign-up" render={this.signUpForm} />
       </div>
