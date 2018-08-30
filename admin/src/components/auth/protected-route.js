@@ -2,8 +2,6 @@ import React from 'react'
 import { Route, Redirect, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-let count = 0
-
 const ProtectedRoute = ({
   authorized,
   component: Component,
