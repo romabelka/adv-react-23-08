@@ -2,55 +2,61 @@ import { appName } from '../config'
 import { Record, Map, List } from 'immutable'
 import { v4 } from 'uuid'
 import { createSelector } from 'reselect'
+import { combineReducers } from 'redux'
 /**
  * Constants
  * */
 export const moduleName = 'users'
 const prefix = `${appName}/${moduleName}`
 
-export const CREATE_USER = `${prefix}/CREATE_USER`
+export const CREATE_USER_SUCCESS = `${prefix}/CREATE_USER_SUCCESS`
 
 /**
  * Reducer
  * */
-export const ReducerRecord = Record({
-  usersById: Map(),
-  userIds: List()
-})
-
-export default function reducer(state = new ReducerRecord(), action) {
-  const { type, payload } = action
-
+function byIds(state = Map(), { type, payload }) {
   switch (type) {
-    case CREATE_USER: {
-      const { id } = payload
-      const usersById = state.get('usersById').set(id, Map(payload))
-      const userIds = state.get('userIds').push(id)
-
-      return state.set('usersById', usersById).set('userIds', userIds)
-    }
+    case CREATE_USER_SUCCESS:
+      return state.set(payload.id, Map(payload))
     default:
       return state
   }
 }
+
+function ids(state = List(), { type, payload }) {
+  switch (type) {
+    case CREATE_USER_SUCCESS:
+      return state.push(payload.id)
+    default:
+      return state
+  }
+}
+
+export default combineReducers({ byIds, ids })
 
 /**
  * Selectors
  * */
 
 const getState = (state) => state[moduleName]
-export const getUsers = createSelector(getState, (users) => {
-  const usersObj = users.toJS()
+const getEntities = (state) => getState(state).byIds
+const getResult = (state) => getState(state).ids
 
-  return usersObj.userIds.map((id) => usersObj.usersById[id])
-})
+export const getUsers = createSelector(
+  getEntities,
+  getResult,
+  (entities, result) => {
+    const jsEntities = entities.toJS()
+    return result.toJS().map((id) => jsEntities[id])
+  }
+)
 
 /**
  * Action Creators
  * */
 
 export const createUser = (userDto) => ({
-  type: CREATE_USER,
+  type: CREATE_USER_SUCCESS,
   payload: {
     ...userDto,
     id: v4()
