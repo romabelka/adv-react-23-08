@@ -35,6 +35,9 @@ export default function reducer(state = new ReducerRecord(), action) {
  * Selectors
  * */
 
+export function isSignedIn(state) {
+  return !!state.auth && !!state.auth.user
+}
 /**
  * Action Creators
  * */

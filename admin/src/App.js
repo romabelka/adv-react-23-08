@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import requireAuth from './components/auth/require-auth'
 
 class App extends Component {
   get menu() {
@@ -23,9 +24,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <h1>Hello World</h1>
         {this.menu}
-        <Route path="/admin" component={AdminRoute} />
+        <Route path="/admin" component={requireAuth(AdminRoute)} />
         <Route path="/auth" component={AuthRoute} />
       </div>
     )

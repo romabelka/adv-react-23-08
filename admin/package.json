@@ -8,6 +8,7 @@
     "firebase": "^5.4.1",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
+    "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-redux": "^5.0.7",
@@ -33,7 +34,8 @@
   "devDependencies": {
     "husky": "^1.0.0-rc.6",
     "lint-staged": "^7.1.0",
-    "prettier": "^1.12.1"
+    "prettier": "^1.12.1",
+    "redux-devtools-extension": "^2.13.5"
   },
   "lint-staged": {
     "*.js": [
