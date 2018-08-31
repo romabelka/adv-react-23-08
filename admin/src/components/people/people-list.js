@@ -16,4 +16,4 @@ class PeopleList extends Component {
   }
 }
 
-export default connect(({ people }) => ({ people }))(PeopleList)
+export default connect((state) => ({ people: state.people }))(PeopleList)

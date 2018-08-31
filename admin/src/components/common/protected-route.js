@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Route, Redirect } from 'react-router'
+import { Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 class ProtectedRoute extends Component {
@@ -16,6 +16,4 @@ class ProtectedRoute extends Component {
   }
 }
 
-export default connect(({ auth }) => ({ user: auth.get('user', null) }))(
-  ProtectedRoute
-)
+export default connect((state) => ({ user: state.auth.user }))(ProtectedRoute)

@@ -15,7 +15,7 @@ export const ADD_PERSON = `${prefix}/ADD_PERSON`
  * Reducer
  * */
 export const ReducerRecord = Record({
-  people: List()
+  people: new List([])
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -23,11 +23,21 @@ export default function reducer(state = new ReducerRecord(), action) {
 
   switch (type) {
     case ADD_PERSON:
-      return state.people.set(state.people.size, {
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        email: payload.email
-      })
+      /* return state.people.push || 
+         * return state.people.set(state.people.size, {
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          email: payload.email
+        })
+        doesnt work too
+        */
+      return state.update('people', (people) =>
+        people.push({
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          email: payload.email
+        })
+      )
 
     default:
       return state
