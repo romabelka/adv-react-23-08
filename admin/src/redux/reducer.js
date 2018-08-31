@@ -2,15 +2,10 @@ import { combineReducers } from 'redux'
 import { reducer as formReducer } from 'redux-form'
 
 import authReducer, { moduleName as authModule } from '../ducks/auth'
-import personReducer, {
-  moduleName as personModule,
-  formReducer as personFormReducer
-} from '../ducks/person'
+import peopleReducer, { moduleName as peopleModule } from '../ducks/people'
 
 export default combineReducers({
+  form,
   [authModule]: authReducer,
-  [personModule]: personReducer,
-  form: formReducer.plugin({
-    person: personFormReducer
-  })
+  [peopleModule]: peopleReducer
 })
