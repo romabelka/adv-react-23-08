@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { reduxForm, Field } from 'redux-form'
+import { reduxForm, Field, reset } from 'redux-form'
 
 class AddUserForm extends Component {
   render() {
@@ -23,6 +23,11 @@ class AddUserForm extends Component {
   }
 }
 
+const FORM_NAME = 'addUser'
+
+const onSubmitSuccess = (result, dispatch) => dispatch(reset(FORM_NAME))
+
 export default reduxForm({
-  form: 'addUser'
+  form: FORM_NAME,
+  onSubmitSuccess
 })(AddUserForm)
