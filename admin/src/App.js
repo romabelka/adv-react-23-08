@@ -2,11 +2,15 @@ import React, { Component, Fragment } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import Error from './components/common/error'
 
 class App extends Component {
   get menu() {
     return (
       <Fragment>
+        <div>
+          <Error />
+        </div>
         <div>
           <NavLink to="/admin" activeStyle={{ color: 'red' }}>
             admin

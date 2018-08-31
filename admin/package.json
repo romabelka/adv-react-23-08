@@ -23,11 +23,12 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "prettier": "prettier --write \"**/*.js\""
+    "prettier": "prettier --write \"**/*.js\"",
+    "prettier-diff": "prettier --list-different \"**/*.js\""
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-push": "npm run prettier-diff"
     }
   },
   "devDependencies": {

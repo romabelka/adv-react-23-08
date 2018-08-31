@@ -1,11 +1,13 @@
 import { appName } from '../config'
 import { Record } from 'immutable'
 import firebase from 'firebase/app'
+import { apiError } from './error'
 
 /**
  * Constants
  * */
 export const moduleName = 'auth'
+
 const prefix = `${appName}/${moduleName}`
 
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
@@ -50,6 +52,7 @@ export function signUp(email, password) {
           payload: { user }
         })
       )
+      .catch((error) => dispatch(apiError(error)))
   }
 }
 
@@ -64,12 +67,15 @@ export function signIn(email, password) {
           payload: { user }
         })
       )
+      .catch((error) => dispatch(apiError(error)))
   }
 }
 
 firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  })
+  if (user) {
+    window.store.dispatch({
+      type: SIGN_IN_SUCCESS,
+      payload: { user }
+    })
+  }
 })
