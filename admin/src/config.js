@@ -1,15 +1,15 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-export const appName = 'adv-react-23-08'
+export const appName = 'adv-react-23-08-da9ac'
 
 const fbConfig = {
-  apiKey: 'AIzaSyAlWpSCiLQOATDM2O869VEYBfT3kuDuxc0',
+  apiKey: 'AIzaSyARk3JUMpCC2j2UABYNzV9Y40_9VqHiq4I',
   authDomain: `${appName}.firebaseapp.com`,
   databaseURL: `https://${appName}.firebaseio.com`,
   projectId: appName,
   storageBucket: `${appName}.appspot.com`,
-  messagingSenderId: '842367541781'
+  messagingSenderId: '17730156966'
 }
 
 firebase.initializeApp(fbConfig)
