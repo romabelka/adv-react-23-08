@@ -1,7 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import { Route, NavLink } from 'react-router-dom'
+import { Route, NavLink, Switch } from 'react-router-dom'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import PeopleRoute from './routes/people'
+import ProtectedRoute from './components/common/protected-route'
 
 class App extends Component {
   get menu() {
@@ -17,17 +19,25 @@ class App extends Component {
             auth
           </NavLink>
         </div>
+        <div>
+          <NavLink to="/people" activeStyle={{ color: 'red' }}>
+            people
+          </NavLink>
+        </div>
       </Fragment>
     )
   }
   render() {
     return (
-      <div>
-        <h1>Hello World</h1>
-        {this.menu}
-        <Route path="/admin" component={AdminRoute} />
-        <Route path="/auth" component={AuthRoute} />
-      </div>
+      <Switch>
+        <Fragment>
+          <h1>Hello World</h1>
+          {this.menu}
+          <ProtectedRoute path="/admin" component={AdminRoute} />
+          <Route path="/auth" component={AuthRoute} />
+          <Route path="/people" component={PeopleRoute} />
+        </Fragment>
+      </Switch>
     )
   }
 }
