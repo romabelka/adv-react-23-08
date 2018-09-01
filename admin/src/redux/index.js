@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import logger from 'redux-logger'
 import createSagaMiddleware from 'redux-saga'
@@ -13,8 +13,12 @@ const enhancer = applyMiddleware(
   routerMiddleware(history),
   logger
 )
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
-const store = createStore(connectRouter(history)(reducer), enhancer)
+const store = createStore(
+  connectRouter(history)(reducer),
+  composeEnhancers(enhancer)
+)
 
 sagaMiddleware.run(rootSaga)
 
