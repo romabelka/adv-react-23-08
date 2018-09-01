@@ -83,15 +83,22 @@ export function signIn(email, password) {
   }
 }
 
-/*
-firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
+/***
+ * API
+ */
+const checkAuthState = () =>
+  new Promise((resolve, reject) => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(
+      (user) => {
+        unsubscribe()
+        resolve(user)
+      },
+      (error) => {
+        unsubscribe()
+        reject(`${error.code} - ${error.message}`)
+      }
+    )
   })
-})
-*/
-
 /**
  * Sagas
  **/
@@ -148,7 +155,19 @@ export function* signInSaga() {
     type: SIGN_IN_LIMIT
   })
 }
+export function* checkAuthSaga() {
+  const user = yield call(checkAuthState)
+  if (user)
+    yield put({
+      type: SIGN_IN_SUCCESS,
+      payload: { user }
+    })
+}
 
 export function* saga() {
-  yield all([takeEvery(SIGN_UP_REQUEST, signUpSaga), signInSaga()])
+  yield all([
+    takeEvery(SIGN_UP_REQUEST, signUpSaga),
+    signInSaga(),
+    checkAuthSaga()
+  ])
 }
