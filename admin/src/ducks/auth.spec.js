@@ -1,6 +1,8 @@
-import { signInSaga } from './auth'
-import { put, take, apply } from 'redux-saga/effects'
+import { signUpSaga, signInSaga } from './auth'
+import { put, take, apply, call } from 'redux-saga/effects'
 import {
+  SIGN_UP_SUCCESS,
+  SIGN_UP_ERROR,
   SIGN_IN_LIMIT,
   SIGN_IN_REQUEST,
   SIGN_IN_SUCCESS,
@@ -56,4 +58,41 @@ describe('Auth saga', () => {
       )
     })
   })
+
+  describe('Sign up saga', () => {
+    it('should execute a successful sign in sequence', () => {
+      const saga = signUpSaga({ payload })
+      expect(saga.next(user).value).toEqual(
+        call(
+          [fbAuth, fbAuth.createUserWithEmailAndPassword],
+          payload.email,
+          payload.password
+        )
+      )
+      expect(saga.next(user).value).toEqual(
+        put({
+          type: SIGN_UP_SUCCESS,
+          payload: { user }
+        })
+      )
+    })
+
+    it('should execute a failing sign up sequence', () => {
+      const saga = signUpSaga({ payload })
+      saga.next() // start generator
+      saga.next(user) // enter 'try' block
+      const error = new Error('Something went wrong')
+      expect(saga.throw(error).value).toEqual(
+        put({
+          type: SIGN_UP_ERROR,
+          error
+        })
+      )
+    })
+  })
+
+  // TODO: how do I test this?
+  // export function* saga() {
+  //   yield all([takeEvery(SIGN_UP_REQUEST, signUpSaga), signInSaga()])
+  // }
 })
