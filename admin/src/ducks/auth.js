@@ -118,8 +118,8 @@ export function* signUpSaga({ payload }) {
   }
 }
 
-export function* signInSaga() {
-  for (let i = 0; i < 3; i++) {
+export function* signInSaga(signInLimit = 3) {
+  for (let i = 0; i < signInLimit; i++) {
     const {
       payload: { email, password }
     } = yield take(SIGN_IN_REQUEST)
