@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { peopleSelector } from '../../ducks/people'
 
 class PeopleList extends Component {
   render() {
@@ -16,4 +17,6 @@ class PeopleList extends Component {
   }
 }
 
-export default connect((state) => ({ people: state.people }))(PeopleList)
+export default connect((state) => ({ people: peopleSelector(state) }))(
+  PeopleList
+)

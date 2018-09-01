@@ -2,6 +2,7 @@ import { appName } from '../config'
 import { Record } from 'immutable'
 import { List } from 'immutable'
 import { reset } from 'redux-form'
+import { createSelector } from 'reselect'
 
 /**
  * Constants
@@ -14,29 +15,24 @@ export const ADD_PERSON = `${prefix}/ADD_PERSON`
 /**
  * Reducer
  * */
-export const ReducerRecord = Record({
-  people: new List([])
+export const ReducerState = Record({
+  entities: new List([])
 })
 
-export default function reducer(state = new ReducerRecord(), action) {
+export const PersonRecord = Record({
+  id: null,
+  firstName: null,
+  lastName: null,
+  email: null
+})
+
+export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action
 
   switch (type) {
     case ADD_PERSON:
-      /* return state.people.push || 
-         * return state.people.set(state.people.size, {
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          email: payload.email
-        })
-        doesnt work too
-        */
-      return state.update('people', (people) =>
-        people.push({
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          email: payload.email
-        })
+      return state.update('entities', (entities) =>
+        entities.push(new PersonRecord(payload))
       )
 
     default:
@@ -48,15 +44,20 @@ export default function reducer(state = new ReducerRecord(), action) {
  * Selectors
  * */
 
+export const stateSelector = (state) => state[moduleName]
+export const peopleSelector = createSelector(stateSelector, (state) =>
+  state.entities.valueSeq().toArray()
+)
+
 /**
  * Action Creators
  * */
 
-export function addPerson(firstName, lastName, email) {
+export function addPerson(person) {
   return (dispatch) => {
     dispatch({
       type: ADD_PERSON,
-      payload: { firstName, lastName, email }
+      payload: { id: '1', ...person }
     })
     dispatch(reset('people'))
   }

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { NavLink, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { signUp, signIn } from '../ducks/auth'
@@ -13,36 +13,11 @@ class PeopleRoute extends Component {
     return (
       <div>
         <h1>People</h1>
-        {this.navMenu}
-        <Route path="/people/people-list" render={this.peopleList} />
-        <Route path="/people/add-person" render={this.addPersonForm} />
+        <PeopleList />
+        <AddPersonForm onSubmit={this.props.addPerson} />
       </div>
     )
   }
-
-  get navMenu() {
-    return (
-      <Fragment>
-        <div>
-          <NavLink to="/people/people-list" activeStyle={{ color: 'red' }}>
-            People
-          </NavLink>
-        </div>
-        <div>
-          <NavLink to="/people/add-person" activeStyle={{ color: 'red' }}>
-            Add New Person
-          </NavLink>
-        </div>
-      </Fragment>
-    )
-  }
-
-  addPersonForm = () => <AddPersonForm onSubmit={this.handleAddPerson} />
-
-  peopleList = () => <PeopleList />
-
-  handleAddPerson = ({ firstName, lastName, email }) =>
-    this.props.addPerson(firstName, lastName, email)
 }
 
 export default connect(
