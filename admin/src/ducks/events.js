@@ -1,6 +1,6 @@
 import { appName, db } from '../config'
 import { createSelector } from 'reselect'
-import { List, Record, OrderedMap } from 'immutable'
+import { Record, OrderedMap } from 'immutable'
 import { put, call, takeEvery, all } from 'redux-saga/effects'
 
 /**
