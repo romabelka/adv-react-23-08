@@ -3,6 +3,7 @@ import { Route, NavLink } from 'react-router-dom'
 import ProtectedRoute from './components/common/protected-route'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import Events from './components/events/events'
 
 class App extends Component {
   get menu() {
@@ -25,6 +26,7 @@ class App extends Component {
     return (
       <div>
         <h1>Hello World</h1>
+        <Events />
         {this.menu}
         <ProtectedRoute path="/admin" component={AdminRoute} />
         <Route path="/auth" component={AuthRoute} />
