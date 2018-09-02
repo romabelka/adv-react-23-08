@@ -127,10 +127,11 @@ export function* signInSaga() {
     try {
       const auth = firebase.auth()
 
-      const user = yield apply(auth, auth.signInWithEmailAndPassword, [
+      const user = yield call(
+        [auth, auth.signInWithEmailAndPassword],
         email,
         password
-      ])
+      )
 
       yield put({
         type: SIGN_IN_SUCCESS,

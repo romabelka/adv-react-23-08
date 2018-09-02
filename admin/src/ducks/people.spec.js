@@ -1,4 +1,14 @@
 import { addPersonSaga, ADD_PERSON_SUCCESS, ADD_PERSON_REQUEST } from './people'
+import {
+  signUpSaga,
+  SIGN_UP_SUCCESS,
+  SIGN_UP_REQUEST,
+  SIGN_UP_ERROR,
+  SIGN_IN_REQUEST,
+  SIGN_IN_SUCCESS,
+  SIGN_IN_ERROR
+} from './auth'
+import firebase from 'firebase/app'
 import { generateId } from './utils'
 import { call, put } from 'redux-saga/effects'
 import { reset } from 'redux-form'
