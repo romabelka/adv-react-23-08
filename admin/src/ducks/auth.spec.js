@@ -1,6 +1,8 @@
 import { call, put, take, apply } from 'redux-saga/effects'
 import firebase from 'firebase/app'
-import {
+import { is as immutableEqual } from 'immutable'
+import reducer, {
+  ReducerRecord,
   signUp,
   signIn,
   signUpSaga,
@@ -104,5 +106,23 @@ describe('Auth saga', () => {
     )
 
     expect(process.next().done).toBe(true)
+  })
+
+  it('should save user on sign up success', () => {
+    const action = { type: SIGN_UP_SUCCESS, payload: { user } }
+    const newState = new ReducerRecord({ user })
+    expect(immutableEqual(newState, reducer(undefined, action))).toBe(true)
+  })
+
+  it('should save user on sign in success', () => {
+    const action = { type: SIGN_IN_SUCCESS, payload: { user } }
+    const newState = new ReducerRecord({ user })
+    expect(immutableEqual(newState, reducer(undefined, action))).toBe(true)
+  })
+
+  it('should not change state on other actions', () => {
+    const action = {}
+    const state = new ReducerRecord({ user })
+    expect(reducer(state, action)).toEqual(state)
   })
 })
