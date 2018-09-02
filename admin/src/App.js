@@ -3,6 +3,7 @@ import { Route, NavLink } from 'react-router-dom'
 import ProtectedRoute from './components/common/protected-route'
 import AuthRoute from './routes/auth'
 import AdminRoute from './routes/admin'
+import PersonsRoute from './routes/persons'
 
 class App extends Component {
   get menu() {
@@ -18,6 +19,11 @@ class App extends Component {
             auth
           </NavLink>
         </div>
+        <div>
+          <NavLink to="/persons" activeStyle={{ color: 'red' }}>
+            persons
+          </NavLink>
+        </div>
       </Fragment>
     )
   }
@@ -28,6 +34,7 @@ class App extends Component {
         {this.menu}
         <ProtectedRoute path="/admin" component={AdminRoute} />
         <Route path="/auth" component={AuthRoute} />
+        <Route path="/persons" component={PersonsRoute} />
       </div>
     )
   }
