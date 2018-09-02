@@ -7,7 +7,6 @@ import {
 
 import { fetchData } from './utils'
 import { call, put } from 'redux-saga/effects'
-import { SIGN_UP_ERROR } from './auth'
 
 describe('Events saga', () => {
   it('should fetch events from db', () => {
