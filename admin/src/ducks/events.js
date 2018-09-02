@@ -3,6 +3,7 @@ import { Record, List } from 'immutable'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
 import { call, put, takeEvery } from 'redux-saga/effects'
+import { getEventsFromDB } from './utils'
 
 /**
  * Constants
@@ -18,7 +19,7 @@ export const GET_EVENTS_ERROR = `${prefix}/GET_EVENTS_ERROR`
  * Reducer
  * */
 export const ReducerRecord = Record({
-  events: List()
+  events: new List([])
 })
 
 export const EventRecord = Record({
@@ -36,7 +37,9 @@ export default function reducer(state = new ReducerRecord(), action) {
   switch (type) {
     case GET_EVENTS_SUCCESS:
       return state.update('events', (events) =>
-        events.push(new EventRecord(payload.event))
+        Object.values(payload.events).map((event) =>
+          events.concat(new EventRecord({ ...event }))
+        )
       )
 
     default:
@@ -71,16 +74,12 @@ export const setEvents = (events) => ({
  **/
 
 export function* getEventsSaga() {
-  console.log('sdf')
   try {
-    const rawEvents = firebase
+    const dbEvents = firebase
       .database()
       .ref()
       .child('events')
-    let events
-    rawEvents.on('value', (shapshot) => {
-      events = shapshot.val()
-    })
+    const events = yield call(getEventsFromDB, dbEvents)
     yield put(setEvents(events))
   } catch (error) {
     console.log(error)
