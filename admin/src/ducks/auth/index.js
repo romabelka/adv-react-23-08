@@ -1,4 +1,4 @@
-import { appName } from '../config'
+import { appName } from '../../config'
 import { Record } from 'immutable'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
