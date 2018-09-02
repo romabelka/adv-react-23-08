@@ -20,14 +20,14 @@ const user = { email }
 Object.freeze(user)
 
 describe('Auth saga', () => {
-  it('shout return sign in action', () => {
+  it('should return sign in action', () => {
     expect(signIn(email, password)).toEqual({
       type: SIGN_IN_REQUEST,
       payload: { email, password }
     })
   })
 
-  it('shout return sign up action', () => {
+  it('should return sign up action', () => {
     expect(signUp(email, password)).toEqual({
       type: SIGN_UP_REQUEST,
       payload: { email, password }
