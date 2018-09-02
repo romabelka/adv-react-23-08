@@ -1,5 +1,5 @@
 import { appName } from '../config'
-import { Record, List } from 'immutable'
+import { Record, OrderedMap } from 'immutable'
 import { put, call, takeEvery } from 'redux-saga/effects'
 import { createSelector } from 'reselect'
 import { fetchEvents } from '../api/firebase'
@@ -17,12 +17,12 @@ export const GET_EVENTS_FAILED = `${prefix}/GET_EVENTS_FAILED`
  * Reducer
  * */
 const ReducerState = Record({
-  entities: new List(),
+  entities: new OrderedMap(),
   loading: false,
   error: null
 })
 
-const EventsRecord = Record({
+const EventRecord = Record({
   id: null,
   title: null,
   url: null,
@@ -42,7 +42,9 @@ export default function reducer(state = new ReducerState(), action) {
       return state
         .set(
           'entities',
-          new List(payload.events.map((item) => new EventsRecord(item)))
+          new OrderedMap(payload.events).map(
+            (item, key) => new EventRecord({ id: key, ...item })
+          )
         )
         .set('loading', false)
         .set('error', null)
@@ -91,7 +93,6 @@ export function* getEventsSaga() {
       payload: { events }
     })
   } catch (e) {
-    console.log(e)
     yield put({
       type: GET_EVENTS_FAILED,
       error: e.message
