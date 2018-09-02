@@ -60,22 +60,6 @@ export function signUp(email, password) {
   }
 }
 
-/*
-export function signUp(email, password) {
-  return (dispatch) => {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((user) =>
-        dispatch({
-          type: SIGN_UP_SUCCESS,
-          payload: { user }
-        })
-      )
-  }
-}
-*/
-
 export function signIn(email, password) {
   return {
     type: SIGN_IN_REQUEST,
@@ -118,8 +102,8 @@ export function* signUpSaga({ payload }) {
   }
 }
 
-export function* signInSaga() {
-  for (let i = 0; i < 3; i++) {
+export function* signInSaga(limit = 3) {
+  for (let i = 0; i < limit; i++) {
     const {
       payload: { email, password }
     } = yield take(SIGN_IN_REQUEST)
