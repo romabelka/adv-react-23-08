@@ -14,6 +14,9 @@ const prefix = `${appName}/${moduleName}`
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
+export const FETCH_MORE_EVENTS_REQUEST = `${prefix}/FETCH_MORE_EVENTS_REQUEST`
+export const FETCH_MORE_EVENTS_START = `${prefix}/FETCH_MORE_EVENTS_START`
+export const FETCH_MORE_EVENTS_SUCCESS = `${prefix}/FETCH_MORE_EVENTS_SUCCESS`
 
 export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
 
@@ -42,6 +45,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
   switch (type) {
     case FETCH_ALL_START:
+    case FETCH_MORE_EVENTS_START:
       return state.set('loading', true)
 
     case FETCH_ALL_SUCCESS:
@@ -50,6 +54,13 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('loaded', true)
         .set('entities', fbToEntities(payload, EventRecord))
 
+    case FETCH_MORE_EVENTS_SUCCESS: {
+      debugger
+      return state
+        .set('loading', false)
+        .mergeIn(['entities'], fbToEntities(payload, EventRecord))
+        .set('loaded', Object.keys(payload).length < 10)
+    }
     case TOGGLE_SELECT:
       return state.update(
         'selected',
@@ -104,6 +115,12 @@ export function fetchAllEvents() {
   }
 }
 
+export function fetchMoreEventsRows() {
+  return {
+    type: FETCH_MORE_EVENTS_REQUEST
+  }
+}
+
 export function toggleSelect(id) {
   return {
     type: TOGGLE_SELECT,
@@ -133,6 +150,32 @@ export function* fetchAllSaga() {
   })
 }
 
+export function* fetchMoreRowsSaga() {
+  debugger
+  const { entities } = yield select(stateSelector)
+
+  const ref = firebase
+    .database()
+    .ref('events')
+    .orderByKey()
+    .limitToFirst(10)
+    .startAt(entities.last() ? entities.last().id : '')
+
+  yield put({
+    type: FETCH_MORE_EVENTS_START
+  })
+
+  const snapshot = yield call([ref, ref.once], 'value')
+
+  yield put({
+    type: FETCH_MORE_EVENTS_SUCCESS,
+    payload: snapshot.val()
+  })
+}
+
 export function* saga() {
-  yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)])
+  yield all([
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    takeEvery(FETCH_MORE_EVENTS_REQUEST, fetchMoreRowsSaga)
+  ])
 }
