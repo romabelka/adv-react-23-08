@@ -15,6 +15,10 @@ export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
 
+export const FETCH_PAGE_REQUEST = `${prefix}/FETCH_PAGE_REQUEST`
+export const FETCH_PAGE_START = `${prefix}/FETCH_PAGE_START`
+export const FETCH_PAGE_SUCCESS = `${prefix}/FETCH_PAGE_SUCCESS`
+
 export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
 
 /**
@@ -49,6 +53,18 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('loading', false)
         .set('loaded', true)
         .set('entities', fbToEntities(payload, EventRecord))
+
+    case FETCH_PAGE_START:
+      return state.set('loading', true)
+
+    case FETCH_PAGE_SUCCESS:
+      return state
+        .set(
+          'entities',
+          state.entities.merge(fbToEntities(payload, EventRecord))
+        )
+        .set('loading', false)
+        .set('loaded', true)
 
     case TOGGLE_SELECT:
       return state.update(
@@ -104,6 +120,13 @@ export function fetchAllEvents() {
   }
 }
 
+export function fetchEventsPage(id = null, amount = 10) {
+  return {
+    type: FETCH_PAGE_REQUEST,
+    payload: { id, amount }
+  }
+}
+
 export function toggleSelect(id) {
   return {
     type: TOGGLE_SELECT,
@@ -133,6 +156,38 @@ export function* fetchAllSaga() {
   })
 }
 
+export function* fetchPageSaga({ payload }) {
+  const { loading } = yield select(stateSelector)
+  if (loading) return
+
+  const ref = payload.id
+    ? firebase
+        .database()
+        .ref('events')
+        .orderByKey()
+        .startAt(payload.id)
+        .limitToFirst(payload.amount)
+    : firebase
+        .database()
+        .ref('events')
+        .orderByKey()
+        .limitToFirst(payload.amount)
+
+  yield put({
+    type: FETCH_PAGE_START
+  })
+
+  const snapshot = yield call([ref, ref.once], 'value')
+
+  yield put({
+    type: FETCH_PAGE_SUCCESS,
+    payload: snapshot.val()
+  })
+}
+
 export function* saga() {
-  yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)])
+  yield all([
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    takeEvery(FETCH_PAGE_REQUEST, fetchPageSaga)
+  ])
 }
