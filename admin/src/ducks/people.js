@@ -1,11 +1,9 @@
 import { appName } from '../config'
 import { Record, List } from 'immutable'
-import { delay } from 'redux-saga'
 import { put, call, takeEvery, select } from 'redux-saga/effects'
 import { reset } from 'redux-form'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
-import { generateId } from './utils'
 
 /**
  * Constants
