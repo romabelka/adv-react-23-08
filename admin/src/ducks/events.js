@@ -55,7 +55,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('entities', fbToEntities(payload, EventRecord))
 
     case FETCH_MORE_EVENTS_SUCCESS: {
-      debugger
       return state
         .set('loading', false)
         .mergeIn(['entities'], fbToEntities(payload, EventRecord))
@@ -151,7 +150,6 @@ export function* fetchAllSaga() {
 }
 
 export function* fetchMoreRowsSaga() {
-  debugger
   const { entities } = yield select(stateSelector)
 
   const ref = firebase

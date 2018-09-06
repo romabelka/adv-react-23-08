@@ -8,7 +8,6 @@ import {
   loadingSelector,
   toggleSelect as handleSelect
 } from '../../ducks/events'
-import Loader from '../common/loader'
 import 'react-virtualized/styles.css'
 
 export class EventsTable extends Component {
@@ -19,8 +18,7 @@ export class EventsTable extends Component {
   }
 
   render() {
-    const { loading, loaded, events } = this.props
-    // if (loading && !loaded) return <Loader />
+    const { loaded, events } = this.props
     return (
       <InfiniteLoader
         isRowLoaded={this.isRowLoaded}
