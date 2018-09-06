@@ -1,4 +1,9 @@
-import { addPersonSaga, ADD_PERSON_SUCCESS, ADD_PERSON_REQUEST } from './people'
+import {
+  ADD_PERSON_REQUEST,
+  ADD_PERSON_SUCCESS,
+  addPeopleToFb,
+  addPersonSaga
+} from './people'
 import { generateId } from './utils'
 import { call, put } from 'redux-saga/effects'
 import { reset } from 'redux-form'
@@ -15,12 +20,13 @@ describe('People Saga', () => {
       payload: { person }
     }
     const process = addPersonSaga(action)
-
-    expect(process.next().value).toEqual(call(generateId))
+    expect(process.next().value).toEqual(
+      call(addPeopleToFb, action.payload.person)
+    )
 
     const id = generateId()
 
-    expect(process.next(id).value).toEqual(
+    expect(process.next({ key: id }).value).toEqual(
       put({
         type: ADD_PERSON_SUCCESS,
         payload: {
