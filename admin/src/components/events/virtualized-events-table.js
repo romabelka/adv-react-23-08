@@ -1,46 +1,61 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Column } from 'react-virtualized'
+import { InfiniteLoader, Table, Column } from 'react-virtualized'
 import {
-  fetchAllEvents,
+  fetchMoreEventsRows,
   eventListSelector,
   loadedSelector,
   loadingSelector,
   toggleSelect as handleSelect
 } from '../../ducks/events'
-import Loader from '../common/loader'
 import 'react-virtualized/styles.css'
 
 export class EventsTable extends Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.props.fetchAllEvents()
+    this.props.fetchMoreEventsRows()
   }
 
   render() {
-    if (this.props.loading && !this.props.loaded) return <Loader />
+    const { loaded, events } = this.props
     return (
-      <Table
-        rowHeight={50}
-        headerHeight={80}
-        width={500}
-        height={400}
-        rowGetter={this.rowGetter}
-        rowCount={this.props.events.length}
-        overscanRowCount={0}
-        onRowClick={this.handleRowClick}
+      <InfiniteLoader
+        isRowLoaded={this.isRowLoaded}
+        loadMoreRows={this.loadMoreRows}
+        rowCount={loaded ? events.length : events.length + 1}
       >
-        <Column dataKey="title" width={200} label="Title" />
-        <Column dataKey="when" width={100} label="Date" />
-        <Column dataKey="where" width={200} label="Place" />
-      </Table>
+        {({ onRowsRendered, registerChild }) => (
+          <Table
+            rowHeight={50}
+            headerHeight={80}
+            width={500}
+            height={400}
+            rowGetter={this.rowGetter}
+            rowCount={events.length}
+            overscanRowCount={5}
+            onRowClick={this.handleRowClick}
+            ref={registerChild}
+            onRowsRendered={onRowsRendered}
+          >
+            <Column dataKey="title" width={200} label="Title" />
+            <Column dataKey="when" width={100} label="Date" />
+            <Column dataKey="where" width={200} label="Place" />
+          </Table>
+        )}
+      </InfiniteLoader>
     )
   }
 
   handleRowClick = ({ rowData }) => this.props.handleSelect(rowData.id)
 
   rowGetter = ({ index }) => this.props.events[index]
+
+  isRowLoaded = ({ index }) => !!this.props.events[index]
+
+  loadMoreRows = () => {
+    this.props.fetchMoreEventsRows()
+  }
 }
 
 export default connect(
@@ -49,5 +64,5 @@ export default connect(
     loading: loadingSelector(state),
     loaded: loadedSelector(state)
   }),
-  { fetchAllEvents, handleSelect }
+  { fetchMoreEventsRows, handleSelect }
 )(EventsTable)
