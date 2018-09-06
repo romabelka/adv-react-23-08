@@ -1,7 +1,12 @@
 import { OrderedMap } from 'immutable'
 
 export function generateId() {
-  return Date.now() + Math.random()
+  return (
+    Date.now() +
+    Math.random()
+      .toString()
+      .replace('.', '')
+  )
 }
 
 export function fbToEntities(values, DataRecord) {
