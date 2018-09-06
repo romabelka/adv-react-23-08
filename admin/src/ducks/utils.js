@@ -12,3 +12,9 @@ export function fbToEntities(values, DataRecord) {
     ])
   )
 }
+
+export const getLastId = (obj) => {
+  const keys = Object.keys(obj)
+
+  return keys[keys.length - 1]
+}

@@ -17,8 +17,11 @@ describe('People Saga', () => {
     const process = addPersonSaga(action)
 
     expect(process.next().value).toEqual(call(generateId))
-
     const id = generateId()
+    /**
+     * Skip sent data to server
+     * */
+    process.next()
 
     expect(process.next(id).value).toEqual(
       put({

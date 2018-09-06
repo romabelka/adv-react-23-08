@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Column } from 'react-virtualized'
 import {
-  fetchAllEvents,
+  fetchChunkEvents,
   eventListSelector,
   loadedSelector,
   loadingSelector,
@@ -15,7 +15,7 @@ export class EventsTable extends Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.props.fetchAllEvents()
+    this.props.fetchChunkEvents()
   }
 
   render() {
@@ -30,6 +30,7 @@ export class EventsTable extends Component {
         rowCount={this.props.events.length}
         overscanRowCount={0}
         onRowClick={this.handleRowClick}
+        onScroll={this.onScroll}
       >
         <Column dataKey="title" width={200} label="Title" />
         <Column dataKey="when" width={100} label="Date" />
@@ -38,8 +39,13 @@ export class EventsTable extends Component {
     )
   }
 
-  handleRowClick = ({ rowData }) => this.props.handleSelect(rowData.id)
+  onScroll = ({ scrollTop, scrollHeight, clientHeight }) => {
+    if (scrollTop + clientHeight >= scrollHeight) {
+      this.props.fetchChunkEvents()
+    }
+  }
 
+  handleRowClick = ({ rowData }) => this.props.handleSelect(rowData.id)
   rowGetter = ({ index }) => this.props.events[index]
 }
 
@@ -49,5 +55,5 @@ export default connect(
     loading: loadingSelector(state),
     loaded: loadedSelector(state)
   }),
-  { fetchAllEvents, handleSelect }
+  { fetchChunkEvents, handleSelect }
 )(EventsTable)
