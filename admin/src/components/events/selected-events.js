@@ -7,6 +7,15 @@ import SelectedEventCard from './selected-event-card'
 class SelectedEvents extends Component {
   static propTypes = {}
 
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.events.length === this.props.events.length &&
+      nextProps.events !== this.props.events
+    ) {
+      this.list.forceUpdateGrid()
+    }
+  }
+
   render() {
     return (
       <List
@@ -14,6 +23,7 @@ class SelectedEvents extends Component {
         height={300}
         rowCount={this.props.events.length}
         rowHeight={100}
+        ref={(el) => (this.list = el)}
         rowRenderer={this.rowRenderer}
       />
     )

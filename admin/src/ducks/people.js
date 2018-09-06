@@ -94,7 +94,7 @@ const fetchPeople = () =>
     .once('value')
     .then((snap) => fbToEntities(snap.val(), PersonRecord))
 
-const addPeopleToFb = (data) =>
+export const addPeopleToFb = (data) =>
   firebase
     .database()
     .ref('people')
@@ -106,7 +106,6 @@ const addPeopleToFb = (data) =>
 
 export function* addPersonSaga(action) {
   const result = yield call(addPeopleToFb, action.payload.person)
-  console.log(result)
   const id = result.key
   yield put({
     type: ADD_PERSON_SUCCESS,
