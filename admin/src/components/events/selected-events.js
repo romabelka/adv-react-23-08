@@ -8,7 +8,6 @@ class SelectedEvents extends Component {
   static propTypes = {}
 
   render() {
-    console.log(this.props.events)
     return (
       <List
         width={400}

@@ -32,7 +32,7 @@ export const ReducerRecord = Record({
   selected: new OrderedSet([]),
   entities: new OrderedMap(),
   indices: new List([]),
-  count: Number.MAX_VALUE // мы не знаем сколько записей
+  count: 9999 // мы не знаем сколько записей и не хотим узнавать загружая все-все данные
 })
 
 export const EventRecord = Record({
@@ -70,6 +70,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             : selected.add(payload.id)
       )
     case FETCH_EVENTS.SUCCESS:
+      let pageSize = action.payload.stopIndex - action.payload.startIndex + 1
       let indices = state.indices
       // чтобы можно было вставить на любой позиции
       indices = indices
@@ -78,14 +79,19 @@ export default function reducer(state = new ReducerRecord(), action) {
             ? action.payload.startIndex
             : indices.size
         )
-        .splice(
-          action.payload.startIndex,
-          action.payload.stopIndex - action.payload.startIndex + 1,
-          ...action.payload.indices
-        )
-      return state
-        .set('indices', indices)
-        .set('entities', state.entities.concat(action.payload.events))
+        .splice(action.payload.startIndex, pageSize, ...action.payload.indices)
+      return (
+        state
+          .set('indices', indices)
+          .set('entities', state.entities.concat(action.payload.events))
+          // если размер страницы меньше чем запрашивали, то мы подошли к концу данных
+          .set(
+            'count',
+            action.payload.indices.length < pageSize
+              ? state.entities.size + action.payload.indices.length
+              : state.count
+          )
+      )
     default:
       return state
   }
@@ -163,7 +169,6 @@ export function toggleSelect(id) {
  */
 
 const fetchPageQuery = (pageSize, startAtKey) => {
-  console.log(`pageSize :${pageSize}`)
   const query = firebase
     .database()
     .ref('events')
@@ -226,18 +231,24 @@ export function* fetchEventsSaga({
   payload: { startIndex, stopIndex, resolve, reject }
 }) {
   try {
-    console.log(`fetchEventsSaga start: ${startIndex}, stop: ${stopIndex}`)
     const indices = yield select(eventsIndicesSelector)
     const startAtKey = indices[startIndex - 1]
       ? indices[startIndex - 1]
       : undefined
 
-    const ref = fetchPageQuery(stopIndex - startIndex + 1, startAtKey)
+    const ref = fetchPageQuery(stopIndex - startIndex + 2, startAtKey)
     const snapshot = yield call([ref, ref.once], 'value')
     const events = snapshot.val()
     const newIndices = Object.keys(events)
 
-    yield put(fetchEventsSuccess(newIndices, events, startIndex, stopIndex))
+    yield put(
+      fetchEventsSuccess(
+        newIndices,
+        events,
+        startIndex > 0 ? startIndex - 1 : 0,
+        stopIndex
+      )
+    )
     resolve()
   } catch (error) {
     yield put({ type: FETCH_EVENTS.FAILURE, error: true, payload: error })
@@ -249,7 +260,6 @@ export function* toggleSelectSaga({ payload: { id } }) {
   try {
     yield put({ type: TOGGLE_SELECT_SAVE.REQUEST })
     const selected = yield select(selectedIdsSelector)
-    console.log(`selected`, selected, id, selected.indexOf(id))
     const updateMethod =
       selected.indexOf(id) === -1 ? addSelectedToFb : removeSelectedFromFb
     yield call(updateMethod, id)

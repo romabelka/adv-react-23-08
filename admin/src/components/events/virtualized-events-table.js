@@ -34,10 +34,10 @@ export class EventsTable extends Component {
           <Table
             rowHeight={50}
             headerHeight={80}
-            width={500}
+            width={800}
             height={400}
             rowGetter={this.rowGetter}
-            rowCount={this.props.events.length + 1}
+            rowCount={this.props.count}
             rowStyle={this.rowStyle}
             overscanRowCount={0}
             onRowClick={this.handleRowClick}
@@ -46,8 +46,8 @@ export class EventsTable extends Component {
               registerChild(el)
             }}
           >
-            <Column dataKey="title" width={200} label="Title" />
-            <Column dataKey="when" width={100} label="Date" />
+            <Column dataKey="title" width={300} label="Title" />
+            <Column dataKey="when" width={300} label="Date" />
             <Column dataKey="where" width={200} label="Place" />
           </Table>
         )}
