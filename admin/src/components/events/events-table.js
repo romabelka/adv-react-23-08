@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  fetchChunkEvents,
+  fetchAllEvents,
   eventListSelector,
   loadedSelector,
   loadingSelector
@@ -13,7 +13,7 @@ export class EventsTable extends Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.props.fetchChunkEvents()
+    this.props.fetchAllEvents()
   }
 
   render() {
@@ -38,5 +38,5 @@ export default connect(
     loading: loadingSelector(state),
     loaded: loadedSelector(state)
   }),
-  { fetchChunkEvents }
+  { fetchAllEvents }
 )(EventsTable)

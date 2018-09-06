@@ -40,7 +40,6 @@ export class EventsTable extends Component {
   }
 
   onScroll = ({ scrollTop, scrollHeight, clientHeight }) => {
-    console.log(scrollTop, scrollHeight, clientHeight, scrollTop + scrollHeight)
     if (scrollTop + clientHeight >= scrollHeight) {
       this.props.fetchChunkEvents()
     }

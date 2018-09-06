@@ -162,7 +162,7 @@ export function* fetchChunkSaga() {
   })
 }
 
-export function* fetchAllSaga() {
+export function* fetcsllSaga() {
   const { loading, loaded } = yield select(stateSelector)
 
   if (loading || loaded) return
