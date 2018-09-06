@@ -4,6 +4,7 @@ import { List, OrderedMap, OrderedSet, Record } from 'immutable'
 import firebase from 'firebase/app'
 import { createSelector } from 'reselect'
 import { createAsyncAction, fbToEntities } from './utils'
+import { SIGN_IN_SUCCESS } from './auth'
 
 /**
  * Constants
@@ -14,9 +15,14 @@ const prefix = `${appName}/${moduleName}`
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
+export const FETCH_SELECTED = createAsyncAction(`${prefix}/FETCH_SELECTED`)
+export const FETCH_EVENTS = createAsyncAction(`${prefix}/FETCH_EVENTS`)
 
 export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
-export const FETCH_EVENTS = createAsyncAction(`${prefix}/FETCH_EVENTS`)
+export const TOGGLE_SELECT_SAVE = createAsyncAction(
+  `${prefix}/TOGGLE_SELECT_SAVE`
+)
+
 /**
  * Reducer
  * */
@@ -52,7 +58,10 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('loaded', true)
         .set('entities', fbToEntities(payload, EventRecord))
 
-    case TOGGLE_SELECT:
+    case FETCH_SELECTED.SUCCESS:
+      return state.set('selected', new OrderedSet(action.payload))
+
+    case TOGGLE_SELECT_SAVE.SUCCESS:
       return state.update(
         'selected',
         (selected) =>
@@ -162,7 +171,36 @@ const fetchPageQuery = (pageSize, startAtKey) => {
     .limitToFirst(pageSize)
   return startAtKey ? query.startAt(startAtKey) : query
 }
-
+const addSelectedToFb = (id) =>
+  firebase
+    .database()
+    .ref('events-selected')
+    .push(id)
+const removeSelectedFromFb = (id) =>
+  firebase
+    .database()
+    .ref('events-selected')
+    .orderByValue()
+    .equalTo(id)
+    .once('value')
+    .then((snap) => Object.keys(snap.val()))
+    .then((keys) =>
+      Promise.all(
+        keys.map((key) =>
+          firebase
+            .database()
+            .ref('events-selected')
+            .child(key)
+            .remove()
+        )
+      )
+    )
+const fetchSelectedEvents = () =>
+  firebase
+    .database()
+    .ref('events-selected')
+    .once('value')
+    .then((snap) => snap.val())
 /**
  * Sagas
  * */
@@ -207,9 +245,31 @@ export function* fetchEventsSaga({
   }
 }
 
+export function* toggleSelectSaga({ payload: { id } }) {
+  try {
+    yield put({ type: TOGGLE_SELECT_SAVE.REQUEST })
+    const selected = yield select(selectedIdsSelector)
+    console.log(`selected`, selected, id, selected.indexOf(id))
+    const updateMethod =
+      selected.indexOf(id) === -1 ? addSelectedToFb : removeSelectedFromFb
+    yield call(updateMethod, id)
+
+    yield put({ type: TOGGLE_SELECT_SAVE.SUCCESS, payload: { id } })
+  } catch (error) {
+    yield put({ type: TOGGLE_SELECT_SAVE.FAILURE, error: true, payload: error })
+  }
+}
+
+export function* signInSuccessSaga() {
+  yield put({ type: FETCH_SELECTED.REQUEST })
+  const result = yield call(fetchSelectedEvents)
+  yield put({ type: FETCH_SELECTED.SUCCESS, payload: Object.values(result) })
+}
 export function* saga() {
   yield all([
+    takeEvery(SIGN_IN_SUCCESS, signInSuccessSaga),
     takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
-    takeEvery(FETCH_EVENTS.REQUEST, fetchEventsSaga)
+    takeEvery(FETCH_EVENTS.REQUEST, fetchEventsSaga),
+    takeEvery(TOGGLE_SELECT, toggleSelectSaga)
   ])
 }

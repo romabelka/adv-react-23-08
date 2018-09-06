@@ -9,12 +9,16 @@ import {
   fetchEvents,
   loadedSelector,
   loadingSelector,
+  selectedIdsSelector,
   toggleSelect as handleSelect
 } from '../../ducks/events'
 import Loader from '../common/loader'
 import 'react-virtualized/styles.css'
 import { createStructuredSelector } from 'reselect'
 
+const selectedStyle = {
+  backgroundColor: 'lightyellow'
+}
 export class EventsTable extends Component {
   static propTypes = {}
 
@@ -34,6 +38,7 @@ export class EventsTable extends Component {
             height={400}
             rowGetter={this.rowGetter}
             rowCount={this.props.events.length + 1}
+            rowStyle={this.rowStyle}
             overscanRowCount={0}
             onRowClick={this.handleRowClick}
             onRowsRendered={onRowsRendered}
@@ -58,6 +63,10 @@ export class EventsTable extends Component {
   handleRowClick = ({ rowData }) => this.props.handleSelect(rowData.id)
 
   rowGetter = ({ index }) => this.props.events[index] || {}
+  rowStyle = ({ index }) => {
+    const id = this.rowGetter({ index }).id
+    return this.props.selected.indexOf(id) === -1 ? {} : selectedStyle
+  }
 }
 
 export default connect(
@@ -66,7 +75,8 @@ export default connect(
     loading: loadingSelector,
     loaded: loadedSelector,
     indices: eventsIndicesSelector,
-    count: eventsCountSelector
+    count: eventsCountSelector,
+    selected: selectedIdsSelector
   }),
   { fetchAllEvents, handleSelect, fetchEvents }
 )(EventsTable)
