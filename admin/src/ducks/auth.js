@@ -83,14 +83,13 @@ export function signIn(email, password) {
   }
 }
 
-if (typeof window !== 'undefined' && 'store' in window) {
-  firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged((user) => {
+  window.store &&
     window.store.dispatch({
       type: SIGN_IN_SUCCESS,
       payload: { user }
     })
-  })
-}
+})
 
 /**
  * Sagas
