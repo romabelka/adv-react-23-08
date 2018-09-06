@@ -14,6 +14,8 @@ const prefix = `${appName}/${moduleName}`
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
+export const FETCH_SLICE_REQUEST = `${prefix}/FETCH_SLICE_REQUEST`
+export const FETCH_SLICE_SUCCESS = `${prefix}/FETCH_SLICE_SUCCESS`
 
 export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
 
@@ -44,11 +46,19 @@ export default function reducer(state = new ReducerRecord(), action) {
     case FETCH_ALL_START:
       return state.set('loading', true)
 
+    case FETCH_SLICE_REQUEST:
+      return state.set('loading', true)
+
     case FETCH_ALL_SUCCESS:
       return state
         .set('loading', false)
         .set('loaded', true)
         .set('entities', fbToEntities(payload, EventRecord))
+
+    case FETCH_SLICE_SUCCESS:
+      return state
+        .set('loading', false)
+        .mergeIn(['entities'], fbToEntities(payload, EventRecord))
 
     case TOGGLE_SELECT:
       return state.update(
@@ -104,6 +114,19 @@ export function fetchAllEvents() {
   }
 }
 
+export function fetchSliceRequest() {
+  return {
+    type: FETCH_SLICE_REQUEST
+  }
+}
+
+export function fetchSliceSuccess(events) {
+  return {
+    type: FETCH_SLICE_SUCCESS,
+    payload: events
+  }
+}
+
 export function toggleSelect(id) {
   return {
     type: TOGGLE_SELECT,
@@ -136,3 +159,25 @@ export function* fetchAllSaga() {
 export function* saga() {
   yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)])
 }
+
+/**
+ * Fetchers
+ */
+
+export function fetchEvents(limit = 10, startKey) {
+  let query = firebase
+    .database()
+    .ref('events')
+    .orderByKey()
+
+  if (startKey) {
+    // we need to increment the limit because we're starting from last record, NOT from next to the last one
+    query = query.startAt(startKey).limitToFirst(limit + 1)
+  } else {
+    query = query.limitToFirst(limit)
+  }
+
+  return query.once('value').then((snapshot) => snapshot.val())
+}
+
+window.fetchEvents = fetchEvents
