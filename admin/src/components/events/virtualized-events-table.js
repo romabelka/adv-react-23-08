@@ -1,46 +1,70 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Column } from 'react-virtualized'
+import { Table, Column, AutoSizer, InfiniteLoader } from 'react-virtualized'
+import 'react-virtualized/styles.css'
 import {
   fetchAllEvents,
+  fetchLazyEvents,
   eventListSelector,
   loadedSelector,
   loadingSelector,
   toggleSelect as handleSelect
 } from '../../ducks/events'
 import Loader from '../common/loader'
-import 'react-virtualized/styles.css'
 
 export class EventsTable extends Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.props.fetchAllEvents()
+    this.props.fetchLazyEvents()
   }
 
   render() {
-    if (this.props.loading && !this.props.loaded) return <Loader />
+    const { loaded, minWidth, events } = this.props
+
     return (
-      <Table
-        rowHeight={50}
-        headerHeight={80}
-        width={500}
-        height={400}
-        rowGetter={this.rowGetter}
-        rowCount={this.props.events.length}
-        overscanRowCount={0}
-        onRowClick={this.handleRowClick}
-      >
-        <Column dataKey="title" width={200} label="Title" />
-        <Column dataKey="when" width={100} label="Date" />
-        <Column dataKey="where" width={200} label="Place" />
-      </Table>
+      <div className="vt-container" style={{ outline: '1px dotted red' }}>
+        <InfiniteLoader
+          isRowLoaded={this.isRowLoaded}
+          loadMoreRows={this.loadMoreRows}
+          rowCount={loaded ? events.lenght : events.length + 1}
+        >
+          {({ onRowsRendered, registerChild }) => (
+            <AutoSizer disableHeight>
+              {({ width }) => (
+                <Table
+                  ref={registerChild}
+                  rowHeight={50}
+                  headerHeight={80}
+                  width={minWidth ? Math.max(minWidth, width) : width}
+                  height={400}
+                  rowGetter={this.rowGetter}
+                  rowCount={events.length}
+                  overscanRowCount={10}
+                  onRowClick={this.handleRowClick}
+                  onRowsRendered={onRowsRendered}
+                >
+                  <Column dataKey="title" width={200} label="Title" />
+                  <Column dataKey="when" width={100} label="Date" />
+                  <Column dataKey="where" width={200} label="Place" />
+                </Table>
+              )}
+            </AutoSizer>
+          )}
+        </InfiniteLoader>
+      </div>
     )
   }
 
   handleRowClick = ({ rowData }) => this.props.handleSelect(rowData.id)
 
   rowGetter = ({ index }) => this.props.events[index]
+
+  isRowLoaded = ({ index }) => index < this.props.events.length
+
+  loadMoreRows = () => {
+    this.props.fetchLazyEvents()
+  }
 }
 
 export default connect(
@@ -49,5 +73,5 @@ export default connect(
     loading: loadingSelector(state),
     loaded: loadedSelector(state)
   }),
-  { fetchAllEvents, handleSelect }
+  { fetchAllEvents, fetchLazyEvents, handleSelect }
 )(EventsTable)
