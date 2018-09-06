@@ -1,9 +1,16 @@
 import { appName } from '../config'
-import { Record, List } from 'immutable'
-import { put, call, takeEvery } from 'redux-saga/effects'
+import { List, OrderedMap, Record } from 'immutable'
+import { call, put, takeEvery, all } from 'redux-saga/effects'
 import { reset } from 'redux-form'
 import { createSelector } from 'reselect'
-import { generateId } from './utils'
+import {
+  createAsyncAction,
+  fbToEntities,
+  fbToEntitiesList,
+  generateId
+} from './utils'
+import { SIGN_IN_SUCCESS } from './auth'
+import firebase from 'firebase/app'
 
 /**
  * Constants
@@ -12,12 +19,12 @@ export const moduleName = 'people'
 const prefix = `${appName}/${moduleName}`
 export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`
 export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`
-
+export const FETCH_ALL_PEOPLE = createAsyncAction(`${prefix}/FETCH_ALL_PERSONS`)
 /**
  * Reducer
  * */
 const ReducerState = Record({
-  entities: new List([])
+  entities: new OrderedMap()
 })
 
 const PersonRecord = Record({
@@ -31,9 +38,14 @@ export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action
 
   switch (type) {
+    case FETCH_ALL_PEOPLE.SUCCESS:
+      return state.set('entities', action.payload)
     case ADD_PERSON_SUCCESS:
       return state.update('entities', (entities) =>
-        entities.push(new PersonRecord(payload.person))
+        entities.set(
+          action.payload.person.id,
+          new PersonRecord(action.payload.person)
+        )
       )
 
     default:
@@ -73,12 +85,29 @@ export function addPerson(person) {
 */
 
 /**
+ * API
+ */
+const fetchPeople = () =>
+  firebase
+    .database()
+    .ref('people')
+    .once('value')
+    .then((snap) => fbToEntities(snap.val(), PersonRecord))
+
+const addPeopleToFb = (data) =>
+  firebase
+    .database()
+    .ref('people')
+    .push(data)
+
+/**
  * Sagas
  **/
 
 export function* addPersonSaga(action) {
-  const id = yield call(generateId)
-
+  const result = yield call(addPeopleToFb, action.payload.person)
+  console.log(result)
+  const id = result.key
   yield put({
     type: ADD_PERSON_SUCCESS,
     payload: {
@@ -89,6 +118,18 @@ export function* addPersonSaga(action) {
   yield put(reset('person'))
 }
 
+export function* signInSuccessSaga() {
+  yield put({ type: FETCH_ALL_PEOPLE.REQUEST })
+  const result = yield call(fetchPeople)
+  yield put({
+    type: FETCH_ALL_PEOPLE.SUCCESS,
+    payload: result || new OrderedMap([])
+  })
+}
+
 export function* saga() {
-  yield takeEvery(ADD_PERSON_REQUEST, addPersonSaga)
+  yield all([
+    yield takeEvery(SIGN_IN_SUCCESS, signInSuccessSaga),
+    yield takeEvery(ADD_PERSON_REQUEST, addPersonSaga)
+  ])
 }
