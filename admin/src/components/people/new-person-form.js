@@ -7,6 +7,8 @@ class NewPersonForm extends Component {
   static propTypes = {}
 
   render() {
+    const { disabled } = this.props
+
     return (
       <div>
         <form onSubmit={this.props.handleSubmit}>
@@ -14,7 +16,7 @@ class NewPersonForm extends Component {
           <Field name="lastName" label="last name" component={ErrorField} />
           <Field name="email" label="email" component={ErrorField} />
           <div>
-            <input type="submit" />
+            <input disabled={disabled} type="submit" />
           </div>
         </form>
       </div>

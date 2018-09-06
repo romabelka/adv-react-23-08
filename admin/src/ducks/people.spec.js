@@ -1,10 +1,15 @@
-import { addPersonSaga, ADD_PERSON_SUCCESS, ADD_PERSON_REQUEST } from './people'
-import { generateId } from './utils'
+import firebase from 'firebase/app'
+import {
+  addPersonSaga,
+  ADD_PERSON_SUCCESS,
+  ADD_PERSON_REQUEST,
+  ADD_PERSON_START
+} from './people'
 import { call, put } from 'redux-saga/effects'
 import { reset } from 'redux-form'
 
 describe('People Saga', () => {
-  it('should generate id for a person', () => {
+  it('should return response with id for a person', () => {
     const person = {
       firstName: 'Roman',
       lastName: 'Yakobchuk',
@@ -14,17 +19,28 @@ describe('People Saga', () => {
       type: ADD_PERSON_REQUEST,
       payload: { person }
     }
+    const response = { key: 'KEY' }
     const process = addPersonSaga(action)
 
-    expect(process.next().value).toEqual(call(generateId))
+    expect(process.next().value).toEqual(
+      put({
+        type: ADD_PERSON_START
+      })
+    )
 
-    const id = generateId()
+    const peopleRef = firebase.database().ref('people')
 
-    expect(process.next(id).value).toEqual(
+    expect(process.next().value).toEqual(
+      call([peopleRef, peopleRef.push], {
+        ...action.payload.person
+      })
+    )
+
+    expect(process.next(response).value).toEqual(
       put({
         type: ADD_PERSON_SUCCESS,
         payload: {
-          person: { id, ...person }
+          person: { id: response.key, ...person }
         }
       })
     )
