@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Table, Column, InfiniteLoader } from 'react-virtualized'
 import 'react-virtualized/styles.css'
 import {
-  fetchAllEvents,
   fetchLazyEvents,
   eventListSelector,
   loadedSelector,
