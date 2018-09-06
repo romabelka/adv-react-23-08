@@ -15,7 +15,13 @@ export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
 
+export const FETCH_CHUNK_REQUEST = `${prefix}/FETCH_CHUNK_REQUEST`
+export const FETCH_CHUNK_START = `${prefix}/FETCH_CHUNK_START`
+export const FETCH_CHUNK_SUCCESS = `${prefix}/FETCH_CHUNK_SUCCESS`
+export const FETCH_CHUNK_FINISH = `${prefix}/FETCH_CHUNK_FINISH`
+
 export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
+export const UPDATE_LAST_ID = `${prefix}/UPDATE_LAST_ID`
 
 /**
  * Reducer
@@ -23,6 +29,7 @@ export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
 export const ReducerRecord = Record({
   loading: false,
   loaded: false,
+  lastLoadedId: null,
   selected: new OrderedSet([]),
   entities: new OrderedMap()
 })
@@ -50,6 +57,16 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('loaded', true)
         .set('entities', fbToEntities(payload, EventRecord))
 
+    case FETCH_CHUNK_START:
+      return state.set('loading', true)
+
+    case FETCH_CHUNK_SUCCESS:
+      return state
+        .set('loading', false)
+        .update('entities', (entities) =>
+          entities.merge(fbToEntities(payload, EventRecord))
+        )
+
     case TOGGLE_SELECT:
       return state.update(
         'selected',
@@ -58,6 +75,9 @@ export default function reducer(state = new ReducerRecord(), action) {
             ? selected.remove(payload.id)
             : selected.add(payload.id)
       )
+
+    case UPDATE_LAST_ID:
+      return state.set('lastLoadedId', payload.id)
 
     default:
       return state
@@ -104,6 +124,12 @@ export function fetchAllEvents() {
   }
 }
 
+export function fetchEventsChunk() {
+  return {
+    type: FETCH_CHUNK_REQUEST
+  }
+}
+
 export function toggleSelect(id) {
   return {
     type: TOGGLE_SELECT,
@@ -114,6 +140,41 @@ export function toggleSelect(id) {
 /**
  * Sagas
  * */
+
+export function* fecthChunkSaga() {
+  const { loading, loaded, lastLoadedId } = yield select(stateSelector)
+  if (loading || loaded) return
+
+  const ref = lastLoadedId
+    ? firebase
+        .database()
+        .ref('events')
+        .orderByKey()
+        .startAt(lastLoadedId)
+        .limitToFirst(10)
+    : firebase
+        .database()
+        .ref('events')
+        .orderByKey()
+        .limitToFirst(10)
+
+  yield put({
+    type: FETCH_CHUNK_START
+  })
+
+  const snapshot = yield call([ref, ref.once], 'value')
+  const [id] = Object.keys(snapshot.val()).reverse()
+
+  yield put({
+    type: UPDATE_LAST_ID,
+    payload: { id }
+  })
+
+  yield put({
+    type: FETCH_CHUNK_SUCCESS,
+    payload: snapshot.val()
+  })
+}
 
 export function* fetchAllSaga() {
   const { loading, loaded } = yield select(stateSelector)
@@ -134,5 +195,5 @@ export function* fetchAllSaga() {
 }
 
 export function* saga() {
-  yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)])
+  yield all([takeEvery(FETCH_CHUNK_REQUEST, fecthChunkSaga)])
 }

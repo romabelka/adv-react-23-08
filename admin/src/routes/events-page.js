@@ -7,7 +7,7 @@ class EventsPage extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{ display: 'flex' }}>
         <SelectedEvents />
         <EventsTable />
       </div>

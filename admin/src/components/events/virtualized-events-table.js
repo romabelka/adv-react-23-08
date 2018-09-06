@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Column } from 'react-virtualized'
 import {
-  fetchAllEvents,
+  fetchEventsChunk,
   eventListSelector,
   loadedSelector,
   loadingSelector,
@@ -15,32 +15,42 @@ export class EventsTable extends Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.props.fetchAllEvents()
+    this.props.fetchEventsChunk()
   }
 
   render() {
-    if (this.props.loading && !this.props.loaded) return <Loader />
     return (
-      <Table
-        rowHeight={50}
-        headerHeight={80}
-        width={500}
-        height={400}
-        rowGetter={this.rowGetter}
-        rowCount={this.props.events.length}
-        overscanRowCount={0}
-        onRowClick={this.handleRowClick}
-      >
-        <Column dataKey="title" width={200} label="Title" />
-        <Column dataKey="when" width={100} label="Date" />
-        <Column dataKey="where" width={200} label="Place" />
-      </Table>
+      <div>
+        <Table
+          rowHeight={50}
+          headerHeight={80}
+          width={500}
+          height={400}
+          rowGetter={this.rowGetter}
+          rowCount={this.props.events.length}
+          overscanRowCount={0}
+          onRowClick={this.handleRowClick}
+          onScroll={this.handleScroll}
+        >
+          <Column dataKey="title" width={200} label="Title" />
+          <Column dataKey="when" width={100} label="Date" />
+          <Column dataKey="where" width={200} label="Place" />
+        </Table>
+        {this.getLoader()}
+      </div>
     )
   }
 
   handleRowClick = ({ rowData }) => this.props.handleSelect(rowData.id)
 
   rowGetter = ({ index }) => this.props.events[index]
+
+  handleScroll = ({ scrollHeight, clientHeight, scrollTop }) =>
+    clientHeight + scrollTop === scrollHeight && this.props.fetchEventsChunk()
+
+  getLoader() {
+    return this.props.loading && !this.props.loaded && <Loader />
+  }
 }
 
 export default connect(
@@ -49,5 +59,5 @@ export default connect(
     loading: loadingSelector(state),
     loaded: loadedSelector(state)
   }),
-  { fetchAllEvents, handleSelect }
+  { fetchEventsChunk, handleSelect }
 )(EventsTable)
