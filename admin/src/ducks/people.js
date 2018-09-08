@@ -1,10 +1,10 @@
 import { appName } from '../config'
-import { Record, List } from 'immutable'
+import { List, OrderedMap, Record } from 'immutable'
 import firebase from 'firebase/app'
-import { put, call, all, takeEvery } from 'redux-saga/effects'
+import { all, call, put, takeEvery } from 'redux-saga/effects'
 import { reset } from 'redux-form'
 import { createSelector } from 'reselect'
-import { fbToEntities } from './utils'
+import { createAsyncAction, fbToEntities } from './utils'
 
 /**
  * Constants
@@ -18,7 +18,9 @@ export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
 
-export const ADD_EVENT_TO_PERSON = `${prefix}/ADD_EVENT_TO_PERSON`
+export const ADD_EVENT_TO_PERSON = createAsyncAction(
+  `${prefix}/ADD_EVENT_TO_PERSON`
+)
 
 /**
  * Reducer
@@ -31,7 +33,8 @@ const PersonRecord = Record({
   id: null,
   firstName: null,
   lastName: null,
-  email: null
+  email: null,
+  events: new OrderedMap()
 })
 
 export default function reducer(state = new ReducerState(), action) {
@@ -44,6 +47,11 @@ export default function reducer(state = new ReducerState(), action) {
     case FETCH_ALL_SUCCESS:
       return state.set('entities', fbToEntities(payload, PersonRecord))
 
+    case ADD_EVENT_TO_PERSON.SUCCESS:
+      return state.setIn(
+        ['entities', payload.personId, 'events', payload.eventId],
+        payload.title
+      )
     default:
       return state
   }
@@ -53,8 +61,12 @@ export default function reducer(state = new ReducerState(), action) {
  * */
 
 export const stateSelector = (state) => state[moduleName]
-export const peopleSelector = createSelector(stateSelector, (state) =>
-  state.entities.valueSeq().toArray()
+export const peopleSelector = createSelector(
+  stateSelector,
+  (state) => state.entities
+)
+export const peopleListSelector = createSelector(peopleSelector, (entities) =>
+  entities.valueSeq().toJS()
 )
 export const idSelector = (_, props) => props.id
 
@@ -78,10 +90,10 @@ export function fetchAllPeople() {
   }
 }
 
-export function addEventToPerson(eventId, personId) {
+export function addEventToPerson(eventId, personId, title) {
   return {
-    type: ADD_EVENT_TO_PERSON,
-    payload: { eventId, personId }
+    type: ADD_EVENT_TO_PERSON.REQUEST,
+    payload: { eventId, personId, title }
   }
 }
 
@@ -99,6 +111,10 @@ export function addPerson(person) {
   }
 }
 */
+
+/**
+ * API
+ */
 
 /**
  * Sagas
@@ -134,10 +150,26 @@ export function* fetchAllSaga() {
     })
   } catch (_) {}
 }
+export function* addPersonToEventSaga({
+  payload: { eventId, personId, title }
+}) {
+  const personRef = firebase
+    .database()
+    .ref('people')
+    .child(personId)
+    .child('events')
+    .child(eventId)
+  yield call([personRef, personRef.set], title)
+  yield put({
+    type: ADD_EVENT_TO_PERSON.SUCCESS,
+    payload: { eventId, personId, title }
+  })
+}
 
 export function* saga() {
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
-    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    takeEvery(ADD_EVENT_TO_PERSON.REQUEST, addPersonToEventSaga)
   ])
 }

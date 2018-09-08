@@ -1,9 +1,11 @@
-import { all, takeEvery, put, take, select, call } from 'redux-saga/effects'
+import { all, call, put, select, take, takeEvery } from 'redux-saga/effects'
 import { appName } from '../config'
-import { Record, OrderedMap, OrderedSet } from 'immutable'
+import { OrderedMap, Record } from 'immutable'
 import firebase from 'firebase/app'
 import { createSelector } from 'reselect'
-import { fbToEntities } from './utils'
+import { createAsyncAction, fbToEntities } from './utils'
+import { SIGN_IN_SUCCESS } from './auth'
+import { peopleSelector } from './people'
 
 /**
  * Constants
@@ -14,7 +16,10 @@ const prefix = `${appName}/${moduleName}`
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
-
+export const FETCH_SELECTED = createAsyncAction(`${prefix}/FETCH_SELECTED`)
+export const TOGGLE_SELECT_SAVE = createAsyncAction(
+  `${prefix}/TOGGLE_SELECT_SAVE`
+)
 export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
 
 export const FETCH_LAZY_REQUEST = `${prefix}/FETCH_LAZY_REQUEST`
@@ -27,7 +32,7 @@ export const FETCH_LAZY_SUCCESS = `${prefix}/FETCH_LAZY_SUCCESS`
 export const ReducerRecord = Record({
   loading: false,
   loaded: false,
-  selected: new OrderedSet([]),
+  selected: new OrderedMap(),
   entities: new OrderedMap()
 })
 
@@ -39,6 +44,12 @@ export const EventRecord = Record({
   url: null,
   when: null,
   where: null
+})
+export const SelectedEventRecord = Record({
+  id: null,
+  title: null,
+  where: null,
+  people: null
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -61,13 +72,16 @@ export default function reducer(state = new ReducerRecord(), action) {
         .mergeIn(['entities'], fbToEntities(payload, EventRecord))
         .set('loaded', Object.keys(payload).length < 10)
 
-    case TOGGLE_SELECT:
+    case FETCH_SELECTED.SUCCESS:
+      return state.set('selected', fbToEntities(payload, SelectedEventRecord))
+
+    case TOGGLE_SELECT_SAVE.SUCCESS:
       return state.update(
         'selected',
         (selected) =>
           selected.has(payload.id)
-            ? selected.remove(payload.id)
-            : selected.add(payload.id)
+            ? selected.delete(payload.id)
+            : selected.set(payload.id, new SelectedEventRecord(payload))
       )
 
     default:
@@ -84,6 +98,10 @@ export const entitiesSelector = createSelector(
   stateSelector,
   (state) => state.entities
 )
+export const selectedSelector = createSelector(
+  stateSelector,
+  (state) => state.selected
+)
 export const loadingSelector = createSelector(
   stateSelector,
   (state) => state.loading
@@ -96,15 +114,37 @@ export const eventListSelector = createSelector(entitiesSelector, (entities) =>
   entities.valueSeq().toArray()
 )
 
-export const selectedIdsSelector = createSelector(stateSelector, (state) =>
-  state.selected.toArray()
+export const selectedEventsListSelector = createSelector(
+  selectedSelector,
+  peopleSelector,
+  (selected, people) =>
+    selected
+      .map((record) => {
+        console.log(record)
+        return record.setIn(
+          ['people'],
+          people
+            .filter((person) => person.hasIn(['events', record.id]))
+            .valueSeq()
+            .toArray()
+            .map(({ firstName, lastName }) => ({ firstName, lastName }))
+        )
+      })
+      .valueSeq()
+      .toArray()
 )
 
-export const selectedEventsListSelector = createSelector(
-  selectedIdsSelector,
+export const getEventByIdSelector = createSelector(
+  (state, id) => id,
   entitiesSelector,
-  (ids, entities) => ids.map((id) => entities.get(id))
+  (id, entities) => entities.get(id)
 )
+export const getSelectedEventByIdSelector = createSelector(
+  (state, id) => id,
+  selectedSelector,
+  (id, selected) => selected.get(id)
+)
+
 /**
  * Action Creators
  * */
@@ -128,6 +168,28 @@ export function fetchLazy() {
   }
 }
 
+/**
+ * API
+ */
+const addSelectedToFb = (id, data) =>
+  firebase
+    .database()
+    .ref('events-selected')
+    .child(id)
+    .set(data)
+const removeSelectedFromFb = (id, data) =>
+  firebase
+    .database()
+    .ref('events-selected')
+    .child(id)
+    .remove()
+
+const fetchSelectedEvents = () =>
+  firebase
+    .database()
+    .ref('events-selected')
+    .once('value')
+    .then((snap) => snap.val())
 /**
  * Sagas
  * */
@@ -180,7 +242,37 @@ export const fetchLazySaga = function*() {
     })
   }
 }
+export function* toggleSelectSaga({ payload: { id } }) {
+  try {
+    yield put({ type: TOGGLE_SELECT_SAVE.REQUEST })
+    const selected = yield select(getSelectedEventByIdSelector, id)
+    const event = yield select(getEventByIdSelector, id)
+    // дублируем чтобы было что показать, даже если не все ивенты загружены
+    const data = {
+      title: event.title,
+      where: event.where
+    }
+
+    const updateMethod = !selected ? addSelectedToFb : removeSelectedFromFb
+    yield call(updateMethod, id, data)
+
+    yield put({ type: TOGGLE_SELECT_SAVE.SUCCESS, payload: { id, ...data } })
+  } catch (error) {
+    yield put({ type: TOGGLE_SELECT_SAVE.FAILURE, error: true, payload: error })
+  }
+}
+export function* signInSuccessSaga() {
+  yield put({ type: FETCH_SELECTED.REQUEST })
+  const result = yield call(fetchSelectedEvents)
+  if (result) yield put({ type: FETCH_SELECTED.SUCCESS, payload: result })
+}
 
 export function* saga() {
-  yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga), fetchLazySaga()])
+  yield all([
+    takeEvery(SIGN_IN_SUCCESS, signInSuccessSaga),
+    takeEvery(TOGGLE_SELECT, toggleSelectSaga),
+
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    fetchLazySaga()
+  ])
 }

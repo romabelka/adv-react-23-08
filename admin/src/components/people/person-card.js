@@ -13,12 +13,17 @@ class PersonCard extends Component {
     const dndStyle = {
       opacity: isDragging ? 0.3 : 1
     }
-
+    console.log(Object.values(person.events))
+    const events = Object.values(person.events).join(', ')
     return (
       <div style={dndStyle}>
-        {connectDragSource(<h3>{person.email}</h3>)}
-        <h4>{person.firstName}</h4>
-        <h4>{person.lastName}</h4>
+        {connectDragSource(
+          <h3 style={{ cursor: 'pointer' }}>{person.email}</h3>
+        )}
+        <h4>
+          {person.firstName} {person.lastName}
+        </h4>
+        <small>{events}</small>
       </div>
     )
   }

@@ -9,6 +9,11 @@ function SelectedEventCard({ event, connectDropTarget, hovered, canDrop }) {
     <div style={{ border: `1px solid ${borderColor}`, height: 100 }}>
       <h3>{event.title}</h3>
       <div>{event.where}</div>
+      <small>
+        {event.people
+          .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
+          .join(', ')}
+      </small>
     </div>
   )
 }
@@ -17,7 +22,11 @@ SelectedEventCard.propTypes = {}
 
 const spec = {
   drop(props, monitor) {
-    props.addEventToPerson(props.event.id, monitor.getItem().id)
+    props.addEventToPerson(
+      props.event.id,
+      monitor.getItem().id,
+      props.event.title
+    )
   }
 }
 
