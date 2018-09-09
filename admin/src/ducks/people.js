@@ -20,6 +20,9 @@ export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
 
 export const ADD_EVENT_TO_PERSON = `${prefix}/ADD_EVENT_TO_PERSON`
 
+export const DROP_PERSON_REQUEST = `${prefix}/DROP_PERSON_REQUEST`
+export const DROP_PERSON_SUCCESS = `${prefix}/DROP_PERSON_SUCCESS`
+
 /**
  * Reducer
  * */
@@ -82,6 +85,13 @@ export function addEventToPerson(eventId, personId) {
   return {
     type: ADD_EVENT_TO_PERSON,
     payload: { eventId, personId }
+  }
+}
+
+export function dropPerson(id) {
+  return {
+    type: DROP_PERSON_REQUEST,
+    payload: { id }
   }
 }
 

@@ -21,6 +21,9 @@ export const FETCH_LAZY_REQUEST = `${prefix}/FETCH_LAZY_REQUEST`
 export const FETCH_LAZY_START = `${prefix}/FETCH_LAZY_START`
 export const FETCH_LAZY_SUCCESS = `${prefix}/FETCH_LAZY_SUCCESS`
 
+export const DROP_EVENT_REQUEST = `${prefix}/DROP_EVENT_REQUEST`
+export const DROP_EVENT_SUCCESS = `${prefix}/DROP_EVENT_SUCCESS`
+
 /**
  * Reducer
  * */
@@ -125,6 +128,13 @@ export function toggleSelect(id) {
 export function fetchLazy() {
   return {
     type: FETCH_LAZY_REQUEST
+  }
+}
+
+export function dropEvent(id) {
+  return {
+    type: DROP_EVENT_REQUEST,
+    payload: { id }
   }
 }
 

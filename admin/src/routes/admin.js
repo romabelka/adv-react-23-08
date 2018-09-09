@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import PersonPage from './person-page'
 import EventsPage from './events-page'
+import TrashBin from '../components/common/trash-bin'
 
 class AdminPage extends Component {
   render() {
     return (
-      <div>
+      <div style={{ position: 'relative' }}>
         <h1>Admin Page</h1>
         <div>
           <NavLink to="/admin/people" activeStyle={{ color: 'red' }}>
@@ -18,6 +19,7 @@ class AdminPage extends Component {
             events
           </NavLink>
         </div>
+        <TrashBin />
         <Route path="/admin/people" component={PersonPage} />
         <Route path="/admin/events" component={EventsPage} />
       </div>
