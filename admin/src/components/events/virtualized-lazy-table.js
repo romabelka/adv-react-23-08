@@ -8,6 +8,7 @@ import {
   eventListSelector
 } from '../../ducks/events'
 import { Table, Column, InfiniteLoader } from 'react-virtualized'
+import DraggableEventRow from './draggable-event-row'
 import 'react-virtualized/styles.css'
 
 export class EventLazyTable extends Component {
@@ -30,6 +31,7 @@ export class EventLazyTable extends Component {
             ref={registerChild}
             rowCount={events.length}
             rowGetter={this.rowGetter}
+            rowRenderer={this.rowRenderer}
             rowHeight={40}
             headerHeight={50}
             overscanRowCount={1}
@@ -55,6 +57,10 @@ export class EventLazyTable extends Component {
   }
 
   rowGetter = ({ index }) => this.props.events[index]
+
+  rowRenderer = ({ key, ...props }) => (
+    <DraggableEventRow key={key} {...props} />
+  )
 
   handleSelect = ({ rowData }) => this.props.toggleSelect(rowData.id)
 }
