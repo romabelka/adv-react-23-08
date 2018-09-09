@@ -19,6 +19,18 @@ class PersonCard extends Component {
         {connectDragSource(<h3>{person.email}</h3>)}
         <h4>{person.firstName}</h4>
         <h4>{person.lastName}</h4>
+        {person.events.length > 0 ? (
+          <div>
+            <span>
+              Events to attend:{' '}
+              {Object.values(person.events)
+                .map((e) => e.title)
+                .join(', ')}
+            </span>
+          </div>
+        ) : (
+          ''
+        )}
       </div>
     )
   }
