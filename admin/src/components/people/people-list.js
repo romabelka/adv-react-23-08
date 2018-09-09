@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { peopleSelector, fetchAllPeople } from '../../ducks/people'
+import { fetchAllPeople, peopleListSelector } from '../../ducks/people'
 import { List } from 'react-virtualized'
 import PersonCard from './person-card'
 
@@ -18,6 +18,7 @@ class PeopleList extends Component {
         rowCount={this.props.people.length}
         rowHeight={150}
         height={400}
+        people={this.props.people} // чтобы уведомить, что нужен re-render если пропс поменялся
         width={400}
       />
     )
@@ -35,7 +36,7 @@ class PeopleList extends Component {
 
 export default connect(
   (state) => ({
-    people: peopleSelector(state)
+    people: peopleListSelector(state)
   }),
   { fetchAllPeople }
 )(PeopleList)

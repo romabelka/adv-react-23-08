@@ -14,6 +14,7 @@ class SelectedEvents extends Component {
         height={300}
         rowCount={this.props.events.length}
         rowHeight={100}
+        events={this.props.events} // чтобы уведомить, что нужен re-render если пропс поменялся
         rowRenderer={this.rowRenderer}
       />
     )
