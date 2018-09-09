@@ -89,9 +89,6 @@ export const peopleSelector = createSelector(stateSelector, (state) =>
       return { events: Object.values(events), ...rest }
     })
 )
-export const peopleHashCodeSelector = createSelector(stateSelector, (state) =>
-  state.entities.hashCode()
-)
 export const idSelector = (_, props) => props.id
 export const personSelector = createSelector(
   stateSelector,

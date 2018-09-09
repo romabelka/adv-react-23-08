@@ -1,10 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {
-  peopleSelector,
-  peopleHashCodeSelector,
-  fetchAllPeople
-} from '../../ducks/people'
+import { peopleSelector, fetchAllPeople } from '../../ducks/people'
 import { List } from 'react-virtualized'
 import PersonCard from './person-card'
 
@@ -23,7 +19,7 @@ class PeopleList extends Component {
         rowHeight={200}
         height={400}
         width={400}
-        peopleHashCode={this.props.peopleHashCode}
+        people={this.props.people}
       />
     )
   }
@@ -40,8 +36,7 @@ class PeopleList extends Component {
 
 export default connect(
   (state) => ({
-    people: peopleSelector(state),
-    peopleHashCode: peopleHashCodeSelector(state) // to re-render the visible part of the list on people list data change
+    people: peopleSelector(state)
   }),
   { fetchAllPeople }
 )(PeopleList)
