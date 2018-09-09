@@ -7,18 +7,22 @@ function SelectedEventCard({ event, connectDropTarget, hovered, canDrop }) {
   const borderColor = canDrop ? (hovered ? 'green' : 'red') : 'black'
   return connectDropTarget(
     <div style={{ border: `1px solid ${borderColor}`, height: 100 }}>
-      <h3>{event.title}</h3>
+      <h3>
+        {event.title} ({event.people.length})
+      </h3>
       <div>{event.where}</div>
-      <small>
-        {event.people
-          .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
-          .join(', ')}
-      </small>
+      <InvitedPeople people={event.people} />
     </div>
   )
 }
 
-SelectedEventCard.propTypes = {}
+const InvitedPeople = ({ people }) => (
+  <small>
+    {people
+      .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
+      .join(', ')}
+  </small>
+)
 
 const spec = {
   drop(props, monitor) {

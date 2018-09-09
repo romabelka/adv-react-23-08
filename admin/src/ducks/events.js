@@ -1,30 +1,23 @@
 import { all, call, put, select, take, takeEvery } from 'redux-saga/effects'
-import { appName } from '../config'
 import { OrderedMap, Record } from 'immutable'
 import firebase from 'firebase/app'
 import { createSelector } from 'reselect'
-import { createAsyncAction, fbToEntities } from './utils'
+import { fbToEntities } from './utils'
 import { SIGN_IN_SUCCESS } from './auth'
 import { peopleSelector } from './people'
-
-/**
- * Constants
- * */
-export const moduleName = 'events'
-const prefix = `${appName}/${moduleName}`
-
-export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
-export const FETCH_ALL_START = `${prefix}/FETCH_ALL_START`
-export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
-export const FETCH_SELECTED = createAsyncAction(`${prefix}/FETCH_SELECTED`)
-export const TOGGLE_SELECT_SAVE = createAsyncAction(
-  `${prefix}/TOGGLE_SELECT_SAVE`
-)
-export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
-
-export const FETCH_LAZY_REQUEST = `${prefix}/FETCH_LAZY_REQUEST`
-export const FETCH_LAZY_START = `${prefix}/FETCH_LAZY_START`
-export const FETCH_LAZY_SUCCESS = `${prefix}/FETCH_LAZY_SUCCESS`
+import {
+  FETCH_ALL_REQUEST,
+  FETCH_ALL_START,
+  FETCH_ALL_SUCCESS,
+  FETCH_LAZY_REQUEST,
+  FETCH_LAZY_START,
+  FETCH_LAZY_SUCCESS,
+  FETCH_SELECTED,
+  moduleName,
+  REMOVE_EVENT,
+  TOGGLE_SELECT,
+  TOGGLE_SELECT_SAVE
+} from './events-types'
 
 /**
  * Reducer
@@ -83,7 +76,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             ? selected.delete(payload.id)
             : selected.set(payload.id, new SelectedEventRecord(payload))
       )
-
+    case REMOVE_EVENT.SUCCESS:
+      return state
+        .removeIn(['entities', payload.eventId])
+        .removeIn(['selected', payload.eventId])
     default:
       return state
   }
@@ -119,9 +115,8 @@ export const selectedEventsListSelector = createSelector(
   peopleSelector,
   (selected, people) =>
     selected
-      .map((record) => {
-        console.log(record)
-        return record.setIn(
+      .map((record) =>
+        record.setIn(
           ['people'],
           people
             .filter((person) => person.hasIn(['events', record.id]))
@@ -129,7 +124,7 @@ export const selectedEventsListSelector = createSelector(
             .toArray()
             .map(({ firstName, lastName }) => ({ firstName, lastName }))
         )
-      })
+      )
       .valueSeq()
       .toArray()
 )
@@ -167,6 +162,12 @@ export function fetchLazy() {
     type: FETCH_LAZY_REQUEST
   }
 }
+export function removeEvent(eventId) {
+  return {
+    type: REMOVE_EVENT.REQUEST,
+    payload: { eventId }
+  }
+}
 
 /**
  * API
@@ -190,6 +191,27 @@ const fetchSelectedEvents = () =>
     .ref('events-selected')
     .once('value')
     .then((snap) => snap.val())
+
+const removeEventFromFb = (id) =>
+  Promise.all([
+    firebase
+      .database()
+      .ref('events')
+      .child(id)
+      .remove(),
+    firebase
+      .database()
+      .ref('events-selected')
+      .child(id)
+      .remove()
+  ])
+const removeEventFromPerson = (eventId, personId) =>
+  firebase
+    .database()
+    .ref('people')
+    .child(personId)
+    .child(`events/${eventId}`)
+    .remove()
 /**
  * Sagas
  * */
@@ -267,11 +289,15 @@ export function* signInSuccessSaga() {
   if (result) yield put({ type: FETCH_SELECTED.SUCCESS, payload: result })
 }
 
+function* removeEventSaga({ payload: { eventId } }) {
+  yield call(removeEventFromFb, eventId)
+  yield put({ type: REMOVE_EVENT.SUCCESS, payload: { eventId } })
+}
 export function* saga() {
   yield all([
     takeEvery(SIGN_IN_SUCCESS, signInSuccessSaga),
     takeEvery(TOGGLE_SELECT, toggleSelectSaga),
-
+    takeEvery(REMOVE_EVENT.REQUEST, removeEventSaga),
     takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
     fetchLazySaga()
   ])

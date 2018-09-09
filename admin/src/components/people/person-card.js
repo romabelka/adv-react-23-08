@@ -13,7 +13,6 @@ class PersonCard extends Component {
     const dndStyle = {
       opacity: isDragging ? 0.3 : 1
     }
-    console.log(Object.values(person.events))
     const events = Object.values(person.events).join(', ')
     return (
       <div style={dndStyle}>
@@ -32,7 +31,6 @@ class PersonCard extends Component {
 const spec = {
   beginDrag(props) {
     return {
-      //            person: props.props
       id: props.person.id,
       DragPreview: PersonDragPreview
     }

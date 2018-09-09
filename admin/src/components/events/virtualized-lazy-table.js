@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  loadingSelector,
-  loadedSelector,
-  toggleSelect,
+  eventListSelector,
   fetchLazy,
-  eventListSelector
+  loadedSelector,
+  loadingSelector,
+  toggleSelect
 } from '../../ducks/events'
-import { Table, Column, InfiniteLoader } from 'react-virtualized'
+import { Column, InfiniteLoader, Table } from 'react-virtualized'
 import 'react-virtualized/styles.css'
+import TableRow from './virtualized-lazy-table-row'
 
 export class EventLazyTable extends Component {
   static propTypes = {}
@@ -37,6 +38,7 @@ export class EventLazyTable extends Component {
             height={300}
             onRowClick={this.handleSelect}
             onRowsRendered={onRowsRendered}
+            rowRenderer={this.rowRenderrer}
             rowClassName="test__event_table_row"
           >
             <Column dataKey="title" width={200} label="name" />
@@ -57,6 +59,7 @@ export class EventLazyTable extends Component {
   rowGetter = ({ index }) => this.props.events[index]
 
   handleSelect = ({ rowData }) => this.props.toggleSelect(rowData.id)
+  rowRenderrer = (props) => <TableRow {...props} />
 }
 
 export default connect(

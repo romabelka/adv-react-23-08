@@ -18,6 +18,7 @@ class PeopleList extends Component {
         rowCount={this.props.people.length}
         rowHeight={150}
         height={400}
+        people={this.props.people} // чтобы уведомить, что нужен re-render если пропс поменялся
         width={400}
       />
     )

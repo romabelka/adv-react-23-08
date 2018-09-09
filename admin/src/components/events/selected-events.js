@@ -8,13 +8,13 @@ class SelectedEvents extends Component {
   static propTypes = {}
 
   render() {
-    console.log(this.props.events)
     return (
       <List
         width={400}
         height={300}
         rowCount={this.props.events.length}
         rowHeight={100}
+        events={this.props.events} // чтобы уведомить, что нужен re-render если пропс поменялся
         rowRenderer={this.rowRenderer}
       />
     )
