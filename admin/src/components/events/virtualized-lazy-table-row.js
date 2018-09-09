@@ -17,6 +17,7 @@ const spec = {
   beginDrag(props) {
     return {
       id: props.rowData.id,
+      title: props.rowData.title,
       DragPreview: TableRowPreview
     }
   }
