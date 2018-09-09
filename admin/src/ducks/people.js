@@ -20,6 +20,9 @@ export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
 
 export const ADD_EVENT_TO_PERSON = `${prefix}/ADD_EVENT_TO_PERSON`
 
+export const DELETE_PERSON_REQUEST = `${prefix}/DELETE_PERSON_REQUEST`
+export const DELETE_PERSON_START = `${prefix}/DELETE_PERSON_START`
+export const DELETE_PERSON_SUCCESS = `${prefix}/DELETE_PERSON_SUCCESS`
 /**
  * Reducer
  * */
@@ -44,6 +47,9 @@ export default function reducer(state = new ReducerState(), action) {
     case FETCH_ALL_SUCCESS:
       return state.set('entities', fbToEntities(payload, PersonRecord))
 
+    case DELETE_PERSON_SUCCESS:
+      return state.deleteIn(['entities', payload.personId])
+
     default:
       return state
   }
@@ -57,6 +63,7 @@ export const peopleSelector = createSelector(stateSelector, (state) =>
   state.entities.valueSeq().toArray()
 )
 export const idSelector = (_, props) => props.id
+export const visitorsArray = (_, props) => props.event.people
 
 export const personSelector = createSelector(
   stateSelector,
@@ -64,6 +71,11 @@ export const personSelector = createSelector(
   (state, id) => state.getIn(['entities', id])
 )
 
+export const visitorsSelector = createSelector(
+  peopleSelector,
+  visitorsArray,
+  (state, ids) => state.filter((item) => ids.indexOf(item.id) > -1)
+)
 /**
  * Action Creators
  * */
@@ -82,6 +94,13 @@ export function addEventToPerson(eventId, personId) {
   return {
     type: ADD_EVENT_TO_PERSON,
     payload: { eventId, personId }
+  }
+}
+
+export function deletePerson(personId) {
+  return {
+    type: DELETE_PERSON_REQUEST,
+    payload: { personId }
   }
 }
 
@@ -135,9 +154,21 @@ export function* fetchAllSaga() {
   } catch (_) {}
 }
 
+export function* deletePersonSaga({ payload }) {
+  const ref = firebase.database().ref('people/' + payload.personId)
+  yield call([ref, ref.set], null)
+  yield put({
+    type: DELETE_PERSON_SUCCESS,
+    payload: {
+      personId: payload.personId
+    }
+  })
+}
+
 export function* saga() {
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
+    takeEvery(DELETE_PERSON_REQUEST, deletePersonSaga),
     takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)
   ])
 }

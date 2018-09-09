@@ -29,6 +29,7 @@ const spec = {
     return {
       //            person: props.props
       id: props.person.id,
+      type: 'person',
       DragPreview: PersonDragPreview
     }
   }
