@@ -25,6 +25,10 @@ export const ADD_PERSON_TO_EVENT = `${prefix}/ADD_PERSON_TO_EVENT`
 export const ADD_PERSON_TO_EVENT_REQUEST = `${prefix}/ADD_PERSON_TO_EVENT_REQUEST`
 export const ADD_PERSON_TO_EVENT_SUCCESS = `${prefix}/ADD_PERSON_TO_EVENT_SUCCESS`
 
+export const DELETE_EVENT_REQUEST = `${prefix}/DELETE_EVENT_REQUEST`
+export const DELETE_EVENT_START = `${prefix}/DELETE_EVENT_START`
+export const DELETE_EVENT_SUCCESS = `${prefix}/DELETE_EVENT_SUCCESS`
+
 /**
  * Reducer
  * */
@@ -71,6 +75,11 @@ export default function reducer(state = new ReducerRecord(), action) {
         ['entities', payload.eventId, 'people'],
         new List(payload.people)
       )
+
+    case DELETE_EVENT_SUCCESS:
+      return state
+        .deleteIn(['entities', payload.eventId])
+        .update('selected', (selected) => selected.remove(payload.eventId))
 
     case TOGGLE_SELECT:
       return state.update(
@@ -144,6 +153,13 @@ export function addPersonToEvent(eventId, personId) {
   return {
     type: ADD_PERSON_TO_EVENT,
     payload: { eventId, personId }
+  }
+}
+
+export function deleteEvent(eventId) {
+  return {
+    type: DELETE_EVENT_REQUEST,
+    payload: { eventId }
   }
 }
 
@@ -222,10 +238,22 @@ export function* addPersonToEventSaga({ payload }) {
   })
 }
 
+export function* deleteEventSaga({ payload }) {
+  const ref = firebase.database().ref('events/' + payload.eventId)
+  yield call([ref, ref.set], null)
+  yield put({
+    type: DELETE_EVENT_SUCCESS,
+    payload: {
+      eventId: payload.eventId
+    }
+  })
+}
+
 export function* saga() {
   yield all([
     takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
     takeEvery(ADD_PERSON_TO_EVENT, addPersonToEventSaga),
+    takeEvery(DELETE_EVENT_REQUEST, deleteEventSaga),
     fetchLazySaga()
   ])
 }
