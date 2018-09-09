@@ -1,9 +1,9 @@
 import { all, takeEvery, put, take, select, call } from 'redux-saga/effects'
 import { appName } from '../config'
-import { Record, OrderedMap, OrderedSet } from 'immutable'
+import { Record, OrderedMap, OrderedSet, List } from 'immutable'
 import firebase from 'firebase/app'
 import { createSelector } from 'reselect'
-import { fbToEntities } from './utils'
+import { eventsToEntities } from './utils'
 
 /**
  * Constants
@@ -20,6 +20,10 @@ export const TOGGLE_SELECT = `${prefix}/TOGGLE_SELECT`
 export const FETCH_LAZY_REQUEST = `${prefix}/FETCH_LAZY_REQUEST`
 export const FETCH_LAZY_START = `${prefix}/FETCH_LAZY_START`
 export const FETCH_LAZY_SUCCESS = `${prefix}/FETCH_LAZY_SUCCESS`
+
+export const ADD_PERSON_TO_EVENT = `${prefix}/ADD_PERSON_TO_EVENT`
+export const ADD_PERSON_TO_EVENT_REQUEST = `${prefix}/ADD_PERSON_TO_EVENT_REQUEST`
+export const ADD_PERSON_TO_EVENT_SUCCESS = `${prefix}/ADD_PERSON_TO_EVENT_SUCCESS`
 
 /**
  * Reducer
@@ -38,7 +42,8 @@ export const EventRecord = Record({
   title: null,
   url: null,
   when: null,
-  where: null
+  where: null,
+  people: new List()
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -53,13 +58,19 @@ export default function reducer(state = new ReducerRecord(), action) {
       return state
         .set('loading', false)
         .set('loaded', true)
-        .set('entities', fbToEntities(payload, EventRecord))
+        .set('entities', eventsToEntities(payload, EventRecord))
 
     case FETCH_LAZY_SUCCESS:
       return state
         .set('loading', false)
-        .mergeIn(['entities'], fbToEntities(payload, EventRecord))
+        .mergeIn(['entities'], eventsToEntities(payload, EventRecord))
         .set('loaded', Object.keys(payload).length < 10)
+
+    case ADD_PERSON_TO_EVENT_SUCCESS:
+      return state.setIn(
+        ['entities', payload.eventId, 'people'],
+        new List(payload.people)
+      )
 
     case TOGGLE_SELECT:
       return state.update(
@@ -105,6 +116,7 @@ export const selectedEventsListSelector = createSelector(
   entitiesSelector,
   (ids, entities) => ids.map((id) => entities.get(id))
 )
+
 /**
  * Action Creators
  * */
@@ -125,6 +137,13 @@ export function toggleSelect(id) {
 export function fetchLazy() {
   return {
     type: FETCH_LAZY_REQUEST
+  }
+}
+
+export function addPersonToEvent(eventId, personId) {
+  return {
+    type: ADD_PERSON_TO_EVENT,
+    payload: { eventId, personId }
   }
 }
 
@@ -181,6 +200,32 @@ export const fetchLazySaga = function*() {
   }
 }
 
+export function* addPersonToEventSaga({ payload }) {
+  const ref = firebase.database().ref('events/' + payload.eventId + '/people')
+
+  const eventList = yield select(entitiesSelector)
+  const target = yield eventList.get(payload.eventId)
+  const targetList = target.people.toArray()
+
+  if (targetList.indexOf(payload.personId) > -1) return
+
+  targetList.push(payload.personId)
+
+  yield call([ref, ref.set], targetList)
+
+  yield put({
+    type: ADD_PERSON_TO_EVENT_SUCCESS,
+    payload: {
+      eventId: payload.eventId,
+      people: targetList
+    }
+  })
+}
+
 export function* saga() {
-  yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga), fetchLazySaga()])
+  yield all([
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    takeEvery(ADD_PERSON_TO_EVENT, addPersonToEventSaga),
+    fetchLazySaga()
+  ])
 }

@@ -57,6 +57,7 @@ export const peopleSelector = createSelector(stateSelector, (state) =>
   state.entities.valueSeq().toArray()
 )
 export const idSelector = (_, props) => props.id
+export const visitorsArray = (_, props) => props.event.people
 
 export const personSelector = createSelector(
   stateSelector,
@@ -64,6 +65,11 @@ export const personSelector = createSelector(
   (state, id) => state.getIn(['entities', id])
 )
 
+export const visitorsSelector = createSelector(
+  peopleSelector,
+  visitorsArray,
+  (state, ids) => state.filter((item) => ids.indexOf(item.id) > -1)
+)
 /**
  * Action Creators
  * */
