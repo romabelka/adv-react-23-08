@@ -1,19 +1,33 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { DropTarget } from 'react-dnd'
 import { connect } from 'react-redux'
-import { addEventToPerson } from '../../ducks/people'
+import { addEventToPerson, peopleSelector } from '../../ducks/people'
 
-function SelectedEventCard({ event, connectDropTarget, hovered, canDrop }) {
-  const borderColor = canDrop ? (hovered ? 'green' : 'red') : 'black'
-  return connectDropTarget(
-    <div style={{ border: `1px solid ${borderColor}`, height: 100 }}>
-      <h3>{event.title}</h3>
-      <div>{event.where}</div>
-    </div>
-  )
+class SelectedEventCard extends Component {
+  render() {
+    const { event, connectDropTarget, hovered, canDrop, people } = this.props
+    const borderColor = canDrop ? (hovered ? 'green' : 'red') : 'black'
+    const peopleOnEvent = people.filter((person) =>
+      person.events.includes(event.id)
+    )
+
+    return connectDropTarget(
+      <div style={{ border: `1px solid ${borderColor}`, height: 100 }}>
+        <h3>{event.title}</h3>
+        <div>{event.where}</div>
+        {peopleOnEvent && (
+          <div>
+            {' '}
+            {'Visitors: '}
+            <span>
+              {peopleOnEvent.map((person) => person.email).join(', ')}
+            </span>
+          </div>
+        )}
+      </div>
+    )
+  }
 }
-
-SelectedEventCard.propTypes = {}
 
 const spec = {
   drop(props, monitor) {
@@ -28,6 +42,6 @@ const collect = (connect, monitor) => ({
 })
 
 export default connect(
-  null,
+  (state) => ({ people: peopleSelector(state) }),
   { addEventToPerson }
 )(DropTarget(['person'], spec, collect)(SelectedEventCard))

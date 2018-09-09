@@ -1,7 +1,7 @@
 import { appName } from '../config'
-import { Record, List } from 'immutable'
+import Immutable, { Record, List } from 'immutable'
 import firebase from 'firebase/app'
-import { put, call, all, takeEvery } from 'redux-saga/effects'
+import { put, call, all, select, takeEvery } from 'redux-saga/effects'
 import { reset } from 'redux-form'
 import { createSelector } from 'reselect'
 import { fbToEntities } from './utils'
@@ -15,10 +15,12 @@ export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`
 export const ADD_PERSON_START = `${prefix}/ADD_PERSON_START`
 export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`
 
+export const ADD_EVENT_TO_PERSON_REQUEST = `${prefix}/ADD_EVENT_TO_PERSON_REQUEST`
+export const ADD_EVENT_TO_PERSON_START = `${prefix}/ADD_EVENT_TO_PERSON_START`
+export const ADD_EVENT_TO_PERSON_SUCCESS = `${prefix}/ADD_EVENT_TO_PERSON_SUCCESS`
+
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
-
-export const ADD_EVENT_TO_PERSON = `${prefix}/ADD_EVENT_TO_PERSON`
 
 /**
  * Reducer
@@ -31,7 +33,8 @@ const PersonRecord = Record({
   id: null,
   firstName: null,
   lastName: null,
-  email: null
+  email: null,
+  events: []
 })
 
 export default function reducer(state = new ReducerState(), action) {
@@ -40,6 +43,9 @@ export default function reducer(state = new ReducerState(), action) {
   switch (type) {
     case ADD_PERSON_SUCCESS:
       return state.setIn(['entities', payload.id], new PersonRecord(payload))
+
+    case ADD_EVENT_TO_PERSON_SUCCESS:
+      return state.setIn(['entities', payload.id, 'events'], payload.events)
 
     case FETCH_ALL_SUCCESS:
       return state.set('entities', fbToEntities(payload, PersonRecord))
@@ -80,7 +86,7 @@ export function fetchAllPeople() {
 
 export function addEventToPerson(eventId, personId) {
   return {
-    type: ADD_EVENT_TO_PERSON,
+    type: ADD_EVENT_TO_PERSON_REQUEST,
     payload: { eventId, personId }
   }
 }
@@ -103,6 +109,38 @@ export function addPerson(person) {
 /**
  * Sagas
  **/
+
+export function* addEventToPersonSaga(action) {
+  yield put({
+    type: ADD_EVENT_TO_PERSON_START,
+    payload: { ...action.payload }
+  })
+
+  const eventsRef = firebase
+    .database()
+    .ref(`people/${action.payload.personId}/events`)
+
+  const state = yield select(stateSelector)
+  const existEvents = state.getIn([
+    'entities',
+    action.payload.personId,
+    'events'
+  ])
+  const newEvents = [...existEvents, action.payload.eventId]
+  console.log('newEvents', newEvents)
+
+  try {
+    yield call([eventsRef, eventsRef.set], newEvents)
+
+    yield put({
+      type: ADD_EVENT_TO_PERSON_SUCCESS,
+      payload: {
+        id: action.payload.personId,
+        events: newEvents
+      }
+    })
+  } catch (e) {}
+}
 
 export function* addPersonSaga(action) {
   yield put({
@@ -138,6 +176,7 @@ export function* fetchAllSaga() {
 export function* saga() {
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
-    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    takeEvery(ADD_EVENT_TO_PERSON_REQUEST, addEventToPersonSaga)
   ])
 }
