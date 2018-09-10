@@ -11,9 +11,10 @@ import {
   spawn,
   cancel,
   cancelled,
-  race
+  race,
+  take
 } from 'redux-saga/effects'
-import { delay } from 'redux-saga'
+import { delay, eventChannel } from 'redux-saga'
 import { reset } from 'redux-form'
 import { createSelector } from 'reselect'
 import { fbToEntities } from './utils'
@@ -221,9 +222,31 @@ export function* cancelableSyncSaga() {
 */
 }
 
+export const createPeopleChanel = () =>
+  eventChannel((emit) => {
+    const callback = (snapshot) => emit({ data: snapshot.val() })
+    const ref = firebase.database().ref('people')
+
+    ref.on('value', callback)
+
+    return () => ref.off('value', callback)
+  })
+
+export function* syncPeopleRealtimeSaga() {
+  const chanel = yield call(createPeopleChanel)
+  while (true) {
+    const { data } = yield take(chanel)
+
+    yield put({
+      type: FETCH_ALL_SUCCESS,
+      payload: data
+    })
+  }
+}
+
 export function* saga() {
   console.log('---', 1)
-  yield spawn(cancelableSyncSaga)
+  yield spawn(syncPeopleRealtimeSaga)
   console.log('---', 2)
 
   const result = yield all([
