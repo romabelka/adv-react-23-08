@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import PersonPage from './person-page'
 import EventsPage from './events-page'
+import Trash from '../components/common/trash'
 
 class AdminPage extends Component {
   render() {
@@ -20,6 +21,7 @@ class AdminPage extends Component {
         </div>
         <Route path="/admin/people" component={PersonPage} />
         <Route path="/admin/events" component={EventsPage} />
+        <Trash />
       </div>
     )
   }
