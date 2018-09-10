@@ -8,8 +8,10 @@ import {
   takeEvery,
   select,
   fork,
+  spawn,
   cancel,
-  cancelled
+  cancelled,
+  race
 } from 'redux-saga/effects'
 import { delay } from 'redux-saga'
 import { reset } from 'redux-form'
@@ -206,15 +208,22 @@ export function* syncPeopleWithPolling() {
 }
 
 export function* cancelableSyncSaga() {
+  yield race({
+    sync: syncPeopleWithPolling(),
+    timeout: delay(5000)
+  })
+
+  throw new Error('Some network error')
+  /*
   const process = yield fork(syncPeopleWithPolling)
   yield delay(5000)
   yield cancel(process)
-  console.log('---', 'canceled')
+*/
 }
 
 export function* saga() {
   console.log('---', 1)
-  yield fork(cancelableSyncSaga)
+  yield spawn(cancelableSyncSaga)
   console.log('---', 2)
 
   const result = yield all([
