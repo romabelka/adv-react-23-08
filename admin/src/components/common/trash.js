@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import { DropTarget } from 'react-dnd'
 import { connect } from 'react-redux'
+import { Motion, spring } from 'react-motion'
 import { deleteEvent } from '../../ducks/events'
 import { deletePerson } from '../../ducks/people'
+
+console.log('---', spring(1))
 
 class Trash extends Component {
   static propTypes = {}
@@ -17,7 +20,18 @@ class Trash extends Component {
       top: 0,
       right: 0
     }
-    return connectDropTarget(<div style={style}>Trash</div>)
+    return (
+      <Motion
+        defaultStyle={{ opacity: 0 }}
+        style={{ opacity: spring(1, { stiffness: 100, damping: 1 }) }}
+      >
+        {(interpolatedStyles) =>
+          connectDropTarget(
+            <div style={{ ...style, ...interpolatedStyles }}>Trash</div>
+          )
+        }
+      </Motion>
+    )
   }
 }
 
