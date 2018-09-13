@@ -2,7 +2,16 @@ import { appName } from '../config'
 import { Record } from 'immutable'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
-import { call, put, takeEvery, take, all, apply } from 'redux-saga/effects'
+import {
+  all,
+  apply,
+  call,
+  put,
+  spawn,
+  take,
+  takeEvery
+} from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
 
 /**
  * Constants
@@ -19,6 +28,7 @@ export const SIGN_UP_REQUEST = `${prefix}/SIGN_UP_REQUEST`
 export const SIGN_UP_SUCCESS = `${prefix}/SIGN_UP_SUCCESS`
 export const SIGN_UP_ERROR = `${prefix}/SIGN_UP_ERROR`
 
+export const SIGN_OUT_SUCCESS = `${prefix}/SIGN_OUT_SUCCESS`
 /**
  * Reducer
  * */
@@ -83,12 +93,12 @@ export function signIn(email, password) {
   }
 }
 
-firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  })
-})
+// firebase.auth().onAuthStateChanged((user) => {
+//   window.store.dispatch({
+//     type: SIGN_IN_SUCCESS,
+//     payload: { user }
+//   })
+// })
 
 /**
  * Sagas
@@ -115,6 +125,14 @@ export function* signUpSaga({ payload }) {
     })
   }
 }
+export const createAuthStateChannel = () =>
+  eventChannel((emit) => {
+    const callback = (user, error) =>
+      emit({ user, error: error ? error : null })
+    const unsubscribe = firebase.auth().onAuthStateChanged(callback)
+
+    return () => unsubscribe()
+  })
 
 export function* signInSaga() {
   for (let i = 0; i < 3; i++) {
@@ -146,7 +164,30 @@ export function* signInSaga() {
     type: SIGN_IN_LIMIT
   })
 }
+export function* watchAuthState() {
+  const channel = yield call(createAuthStateChannel)
+  while (true) {
+    const { user, error } = yield take(channel)
+
+    if (user)
+      yield put({
+        type: SIGN_IN_SUCCESS,
+        payload: { user }
+      })
+    else if (error)
+      yield put({
+        type: SIGN_IN_ERROR,
+        error
+      })
+    else
+      yield put({
+        type: SIGN_OUT_SUCCESS
+      })
+  }
+}
 
 export function* saga() {
+  yield spawn(watchAuthState)
+
   yield all([takeEvery(SIGN_UP_REQUEST, signUpSaga), signInSaga()])
 }
