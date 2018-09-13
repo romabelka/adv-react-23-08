@@ -2,7 +2,16 @@ import { appName } from '../config'
 import { Record } from 'immutable'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
-import { call, put, takeEvery, take, all, apply } from 'redux-saga/effects'
+import {
+  call,
+  put,
+  takeEvery,
+  take,
+  all,
+  apply,
+  spawn
+} from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
 
 /**
  * Constants
@@ -83,36 +92,48 @@ export function signIn(email, password) {
   }
 }
 
-firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  })
-})
-
 /**
  * Sagas
  **/
+export const authChanel = () =>
+  eventChannel((emit) => {
+    const callback = (user) => emit({ user })
+
+    const ref = firebase.auth()
+    ref.onAuthStateChanged(callback)
+
+    return () => ref.unsubscribe()
+  })
 
 export function* signUpSaga({ payload }) {
   const auth = firebase.auth()
 
   try {
-    const user = yield call(
+    yield call(
       [auth, auth.createUserWithEmailAndPassword],
       payload.email,
       payload.password
     )
-
-    yield put({
-      type: SIGN_UP_SUCCESS,
-      payload: { user }
-    })
   } catch (error) {
     yield put({
       type: SIGN_UP_ERROR,
       error
     })
+  }
+}
+
+export function* syncAuthSaga() {
+  const chanel = yield call(authChanel)
+
+  while (true) {
+    const { user } = yield take(chanel)
+
+    if (user) {
+      yield put({
+        type: SIGN_IN_SUCCESS,
+        payload: { user }
+      })
+    }
   }
 }
 
@@ -125,15 +146,7 @@ export function* signInSaga() {
     try {
       const auth = firebase.auth()
 
-      const user = yield apply(auth, auth.signInWithEmailAndPassword, [
-        email,
-        password
-      ])
-
-      yield put({
-        type: SIGN_IN_SUCCESS,
-        payload: { user }
-      })
+      yield apply(auth, auth.signInWithEmailAndPassword, [email, password])
     } catch (error) {
       yield put({
         type: SIGN_IN_ERROR,
@@ -148,5 +161,7 @@ export function* signInSaga() {
 }
 
 export function* saga() {
+  yield spawn(syncAuthSaga)
+
   yield all([takeEvery(SIGN_UP_REQUEST, signUpSaga), signInSaga()])
 }
