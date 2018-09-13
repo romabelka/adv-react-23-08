@@ -21,6 +21,9 @@ export const FETCH_LAZY_REQUEST = `${prefix}/FETCH_LAZY_REQUEST`
 export const FETCH_LAZY_START = `${prefix}/FETCH_LAZY_START`
 export const FETCH_LAZY_SUCCESS = `${prefix}/FETCH_LAZY_SUCCESS`
 
+export const DELETE_EVENT_REQUEST = `${prefix}/DELETE_EVENT_REQUEST`
+export const DELETE_EVENT_SUCCESS = `${prefix}/DELETE_EVENT_SUCCESS`
+
 /**
  * Reducer
  * */
@@ -70,6 +73,15 @@ export default function reducer(state = new ReducerRecord(), action) {
             : selected.add(payload.id)
       )
 
+    case DELETE_EVENT_REQUEST:
+      return state.set('loading', true)
+
+    case DELETE_EVENT_SUCCESS:
+      return state
+        .set('loading', false)
+        .deleteIn(['entities', payload.id])
+        .update('selected', (selected) => selected.remove(payload.id))
+
     default:
       return state
   }
@@ -105,6 +117,14 @@ export const selectedEventsListSelector = createSelector(
   entitiesSelector,
   (ids, entities) => ids.map((id) => entities.get(id))
 )
+
+export const idSelector = (state, props) => props.id
+export const eventSelector = createSelector(
+  entitiesSelector,
+  idSelector,
+  (entities, id) => entities.get(id)
+)
+
 /**
  * Action Creators
  * */
@@ -125,6 +145,13 @@ export function toggleSelect(id) {
 export function fetchLazy() {
   return {
     type: FETCH_LAZY_REQUEST
+  }
+}
+
+export function deleteEvent(id) {
+  return {
+    type: DELETE_EVENT_REQUEST,
+    payload: { id }
   }
 }
 
@@ -181,6 +208,24 @@ export const fetchLazySaga = function*() {
   }
 }
 
+export const deleteEventSaga = function*(action) {
+  const { payload } = action
+  const ref = firebase.database().ref(`events/${payload.id}`)
+
+  try {
+    yield call([ref, ref.remove])
+
+    yield put({
+      type: DELETE_EVENT_SUCCESS,
+      payload
+    })
+  } catch (_) {}
+}
+
 export function* saga() {
-  yield all([takeEvery(FETCH_ALL_REQUEST, fetchAllSaga), fetchLazySaga()])
+  yield all([
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
+    fetchLazySaga(),
+    takeEvery(DELETE_EVENT_REQUEST, deleteEventSaga)
+  ])
 }
