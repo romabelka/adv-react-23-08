@@ -2,7 +2,16 @@ import { appName } from '../config'
 import { Record } from 'immutable'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
-import { call, put, takeEvery, take, all, apply } from 'redux-saga/effects'
+import {
+  call,
+  put,
+  takeEvery,
+  take,
+  all,
+  apply,
+  spawn
+} from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
 
 /**
  * Constants
@@ -60,22 +69,6 @@ export function signUp(email, password) {
   }
 }
 
-/*
-export function signUp(email, password) {
-  return (dispatch) => {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((user) =>
-        dispatch({
-          type: SIGN_UP_SUCCESS,
-          payload: { user }
-        })
-      )
-  }
-}
-*/
-
 export function signIn(email, password) {
   return {
     type: SIGN_IN_REQUEST,
@@ -83,31 +76,41 @@ export function signIn(email, password) {
   }
 }
 
-firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  })
-})
-
 /**
  * Sagas
  **/
+
+export const authStateChanelCreator = () =>
+  eventChannel((emit) => {
+    const event = firebase.auth()
+    event.onAuthStateChanged((user) => emit(user))
+
+    return () => {
+      event.unsubscribe()
+    }
+  })
+
+export function* authStateHandler(user) {
+  yield put({
+    type: SIGN_IN_SUCCESS,
+    payload: { user }
+  })
+}
+
+export function* authStateManager() {
+  const authStateChannel = yield authStateChanelCreator()
+  yield takeEvery(authStateChannel, authStateHandler)
+}
 
 export function* signUpSaga({ payload }) {
   const auth = firebase.auth()
 
   try {
-    const user = yield call(
+    yield call(
       [auth, auth.createUserWithEmailAndPassword],
       payload.email,
       payload.password
     )
-
-    yield put({
-      type: SIGN_UP_SUCCESS,
-      payload: { user }
-    })
   } catch (error) {
     yield put({
       type: SIGN_UP_ERROR,
@@ -125,15 +128,7 @@ export function* signInSaga() {
     try {
       const auth = firebase.auth()
 
-      const user = yield apply(auth, auth.signInWithEmailAndPassword, [
-        email,
-        password
-      ])
-
-      yield put({
-        type: SIGN_IN_SUCCESS,
-        payload: { user }
-      })
+      yield apply(auth, auth.signInWithEmailAndPassword, [email, password])
     } catch (error) {
       yield put({
         type: SIGN_IN_ERROR,
@@ -148,5 +143,6 @@ export function* signInSaga() {
 }
 
 export function* saga() {
+  yield spawn(authStateManager)
   yield all([takeEvery(SIGN_UP_REQUEST, signUpSaga), signInSaga()])
 }
