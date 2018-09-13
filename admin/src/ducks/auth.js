@@ -82,10 +82,11 @@ export function signIn(email, password) {
 
 export const authStateChanelCreator = () =>
   eventChannel((emit) => {
-    firebase.auth().onAuthStateChanged((user) => emit(user))
+    const event = firebase.auth()
+    event.onAuthStateChanged((user) => emit(user))
 
     return () => {
-      console.log('event off')
+      event.unsubscribe()
     }
   })
 
