@@ -15,7 +15,7 @@ class Auth extends Component {
         return (
             <View style = {styles.container}>
                 <View>
-                    <Text style = {styles.email}>Email:</Text>
+                    <Text style = {[styles.email, {fontSize: 20}]}>Email:</Text>
                     <TextInput
                         style = {styles.input}
                         value={this.state.email}
