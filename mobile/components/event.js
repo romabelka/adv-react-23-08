@@ -1,7 +1,19 @@
 import React, { Component } from 'react'
-import {View, StyleSheet, Text, Image, TouchableOpacity, Dimensions, Alert } from 'react-native'
+import {View, StyleSheet, Text, Image, TouchableOpacity, Dimensions, Alert, Modal, Button } from 'react-native'
 
 class Event extends Component {
+    state = {
+      modalVisible: false,
+    };
+
+    toggleModalVisible = () => {
+      this.setState({modalVisible: !this.state.modalVisible});
+    }
+
+    requestCloseHandler = () => {
+      console.log('Modal has been closed.');
+    }
+
 
     toggleModal = () => {
       Alert.alert(
@@ -27,7 +39,7 @@ class Event extends Component {
                 <View>
                   <View style={styles.titleContainer}>
                     <Text style={styles.titleText}>{title}</Text>
-                    <TouchableOpacity onPress={this.toggleModal} style={styles.deleteButton}>
+                    <TouchableOpacity onPress={this.toggleModalVisible} style={styles.deleteButton}>
                       <Text style={styles.deleteButtonText}>delete</Text>
                     </TouchableOpacity>
                   </View>
@@ -41,6 +53,26 @@ class Event extends Component {
                     <Text style={styles.url}>{url}</Text>
                   </View>
                 </View>
+
+                <Modal animationType="fade"
+                       transparent={true}
+                       visible={this.state.modalVisible}
+                       onRequestClose={this.requestCloseHandler} >
+                  <View  style={styles.modalWrapper}>
+                    <View style={styles.modalContainer}>
+                      <Text style={styles.modalText}>Do you want to delete {title} event?</Text>
+
+                      <View style={styles.modalButtons}>
+                        <Button title="Cancel" onPress={() => {
+                          this.toggleModalVisible();
+                        }}/>
+                        <Button title="YES" onPress={() => {
+                          this.toggleModalVisible();
+                        }}/>
+                      </View>
+                    </View>
+                  </View>
+                </Modal>
             </View>
         )
     }
@@ -97,7 +129,29 @@ const styles = StyleSheet.create({
     },
     deleteButtonText: {
       color: '#fff'
-    }
+    },
+  modalWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.3)'
+  },
+  modalContainer: {
+      width: 250,
+      height: 150,
+      padding: 20,
+      justifyContent: 'space-between',
+      alignItems: 'stretch',
+      backgroundColor: '#fff'
+  },
+  modalButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+  },
+  modalText: {
+      fontSize: 18,
+      textAlign: 'center'
+  }
 })
 
 export default Event
