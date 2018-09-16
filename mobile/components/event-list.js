@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { SectionList, Text } from "react-native";
-import { EventListItem } from "./event-list-item";
+import React, {Component} from "react";
+import {SectionList, Text} from "react-native";
+import {EventListItem} from "./event-list-item";
 
 class EventList extends Component {
   static propTypes = {};
@@ -30,11 +30,11 @@ class EventList extends Component {
 const groupData = data =>
   Object.values(
     data.reduce((r, e) => {
-      let title = e.title[0];
+      let title = e.title[0].toUpperCase();
       if (!r[title]) r[title] = { title, data: [e] };
       else r[title].data.push(e);
       return r;
     }, {})
-  );
+  ).slice(0).sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0) );
 
 export default EventList;
