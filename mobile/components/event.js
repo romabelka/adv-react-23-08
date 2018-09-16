@@ -1,7 +1,17 @@
 import React, { Component } from 'react'
-import {View, StyleSheet, Text, Image } from 'react-native'
+import {View, StyleSheet, Text, Image, Button, Alert } from 'react-native'
 
 class Event extends Component {
+
+  showAlertDeleting = () => Alert.alert(
+    'Delete event',
+    'Are you sure?',
+    [
+      {text: 'Cancel', onPress: () => console.log('Cancel')},
+      {text: 'OK', onPress: () => console.log('Event is delete.')}
+    ],
+    {cancelable: false}
+  )
 
     render() {
         const { title, when, url } = this.props.event
@@ -10,6 +20,11 @@ class Event extends Component {
                 <Text style = {styles.eventTitle}>{title}</Text>
                 <Text>{when}</Text>
                 <Text>{url}</Text>
+                <Button
+                  color="red"
+                  title="Delete"
+                  onPress={this.showAlertDeleting}
+                />
             </View>
         )
     }
