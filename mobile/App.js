@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Image, View } from 'react-native';
+import React from "react";
+import { StyleSheet, Image, SafeAreaView, StatusBar } from "react-native";
 //import HelloWorld from './components/hello-world'
 //import Auth from './components/auth'
 import Event from './components/event'
@@ -10,25 +10,25 @@ const eventList = Object.entries(data.events).map(([ id, event ]) => ({ id, ...e
 export default class App extends React.Component {
   render() {
     return (
-      <View>
-          <Image source={require('./assets/logo.png')}
-            style = {styles.image}
+      <SafeAreaView style={styles.container}>
+        <Image
+          source={require("./assets/logo.png")}
+          style={styles.image}
+          resizeMode="contain"
           />
-          <EventList events = {eventList}/>
-      </View>
+        <EventList events={eventList} />
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: StatusBar.currentHeight,
+    flex: 1
   },
     image: {
-      width: '100%',
+    width: "100%",
       height: 100
     }
 });
