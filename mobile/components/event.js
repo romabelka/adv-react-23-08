@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
-import {View, StyleSheet, Text, Image } from 'react-native'
+import React, {Component} from 'react'
+import {Image, StyleSheet, Text, View} from 'react-native'
 
 class Event extends Component {
-
     render() {
         const { title, when, url } = this.props.event
         return (
