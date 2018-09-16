@@ -3,6 +3,8 @@ import { Record } from 'immutable'
 import { createSelector } from 'reselect'
 import firebase from 'firebase/app'
 import { call, put, takeEvery, take, all, apply } from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
+import { replace } from 'connected-react-router'
 
 /**
  * Constants
@@ -14,6 +16,8 @@ export const SIGN_IN_REQUEST = `${prefix}/SIGN_IN_REQUEST`
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
 export const SIGN_IN_ERROR = `${prefix}/SIGN_IN_ERROR`
 export const SIGN_IN_LIMIT = `${prefix}/SIGN_IN_LIMIT`
+
+export const SIGN_OUT_SUCCESS = `${prefix}/SIGN_OUT_SUCCESS`
 
 export const SIGN_UP_REQUEST = `${prefix}/SIGN_UP_REQUEST`
 export const SIGN_UP_SUCCESS = `${prefix}/SIGN_UP_SUCCESS`
@@ -83,12 +87,30 @@ export function signIn(email, password) {
   }
 }
 
-firebase.auth().onAuthStateChanged((user) => {
-  window.store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  })
-})
+const createAuthChannel = () =>
+  eventChannel((emit) =>
+    firebase.auth().onAuthStateChanged((user) => emit({ user }))
+  )
+
+export const watchStatusChangeSaga = function*() {
+  const chan = yield call(createAuthChannel)
+  while (true) {
+    const { user } = yield take(chan)
+
+    if (user) {
+      yield put({
+        type: SIGN_IN_SUCCESS,
+        payload: { user }
+      })
+    } else {
+      yield put({
+        type: SIGN_OUT_SUCCESS,
+        payload: { user }
+      })
+      yield put(replace('/auth/sign-in'))
+    }
+  }
+}
 
 /**
  * Sagas
@@ -148,5 +170,9 @@ export function* signInSaga() {
 }
 
 export function* saga() {
-  yield all([takeEvery(SIGN_UP_REQUEST, signUpSaga), signInSaga()])
+  yield all([
+    takeEvery(SIGN_UP_REQUEST, signUpSaga),
+    signInSaga(),
+    watchStatusChangeSaga()
+  ])
 }
