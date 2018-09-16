@@ -14,7 +14,8 @@ export default class App extends React.Component {
           <Image source={require('./assets/logo.png')}
             style = {styles.image}
           />
-          <EventList events = {eventList}/>
+        {/*<EventList events = {eventList}/>*/}
+        <Event event = {eventList[0]} />
       </View>
     );
   }
