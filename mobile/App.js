@@ -10,7 +10,9 @@ const eventList = Object.entries(data.events).map(([ id, event ]) => ({ id, ...e
 export default class App extends React.Component {
   render() {
     return (
-      <View>
+      <View
+		  style = {styles.container}
+	  >
           <Image source={require('./assets/logo.png')}
             style = {styles.image}
           />
@@ -22,13 +24,15 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
+  	paddingTop: 60,
+  	paddingBottom: 60,
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
     image: {
-      width: '100%',
-      height: 100
+      width: 200,
+      height: 30
     }
 });
