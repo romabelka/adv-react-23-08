@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Image, View } from 'react-native';
 //import HelloWorld from './components/hello-world'
 //import Auth from './components/auth'
-import Event from './components/event'
+//import Event from './components/event'
 import EventList from './components/event-list'
 import data from './fixtures'
 const eventList = Object.entries(data.events).map(([ id, event ]) => ({ id, ...event }))
