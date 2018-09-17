@@ -17,16 +17,17 @@ class Auth extends Component {
                     <Text style = {[styles.email, {fontSize: 20}]}>Email:</Text>
                     <TextInput
                         style = {styles.input}
-                        value={auth.email}
+//                        value={auth.email}
                         onChangeText={auth.changeEmail}
                         keyboardType="email-address"
                     />
+                    <Text>email is {auth.isValidEmail ? 'valid' : 'invalid'}</Text>
                 </View>
                 <View>
                     <Text>Password:</Text>
                     <TextInput
                         style = {styles.input}
-                        value = {auth.password}
+  //                      value = {auth.password}
                         onChangeText={auth.changePassword}
                         secureTextEntry
                     />
