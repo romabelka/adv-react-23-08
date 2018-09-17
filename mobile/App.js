@@ -12,7 +12,7 @@ export default class App extends React.Component {
   render() {
     return (
         <Provider {...stores}>
-          <AppNavigator />
+          <AppNavigator ref = {stores.navigation.setNavRef}/>
         </Provider>
     )
   }

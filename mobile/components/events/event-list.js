@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import {Text, StyleSheet, SectionList, TouchableOpacity} from 'react-native'
+import {inject} from 'mobx-react'
 import EventCard from './event-card'
 import groupBy from 'lodash/groupBy'
 
+@inject('navigation')
 class EventList extends Component {
     static propTypes = {
 
@@ -17,12 +19,14 @@ class EventList extends Component {
         return <SectionList
             sections = {sections}
             renderSectionHeader = {({section}) => <Text style={styles.header}>{section.title}</Text>}
-            renderItem = {({item}) => <TouchableOpacity onPress = {() => this.props.onEventPress(item.event)}>
+            renderItem = {({item}) => <TouchableOpacity onPress = {() => this.handleEventPress(item.event)}>
                     <EventCard event = {item.event} />
                 </TouchableOpacity>
                 }
         />
     }
+
+    handleEventPress = ({ id, title }) => this.props.navigation.goTo('event', { id, title })
 }
 
 const styles = StyleSheet.create({

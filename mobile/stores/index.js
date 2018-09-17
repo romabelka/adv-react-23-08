@@ -1,12 +1,9 @@
-import {autorun} from 'mobx'
 import AuthStore from './auth'
+import NavigationStore from './navigation'
 
 const auth = new AuthStore()
-
-autorun(() => {
-    console.log(123, auth.email)
-})
+const navigation = new NavigationStore()
 
 export default {
-    auth
+    auth, navigation
 }
