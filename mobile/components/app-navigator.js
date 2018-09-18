@@ -12,8 +12,13 @@ export default createStackNavigator({
     },
     event: {
         screen: EventScreen
+
     },
     eventList: {
-        screen: EventListScreen
-    }
+        screen: EventListScreen,
+        navigationOptions: {
+            title: 'Event List',
+            headerLeft:null
+        }
+    },
 })
