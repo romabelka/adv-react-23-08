@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Auth from '../auth'
+import { NavigationActions, StackActions } from 'react-navigation'
 
 class AuthScreen extends Component {
     static propTypes = {
@@ -10,7 +11,17 @@ class AuthScreen extends Component {
         return <Auth onSignIn = {this.handleSignIn}/>
     }
 
-    handleSignIn = () => this.props.navigation.navigate('eventList')
+    handleSignIn = () => {
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({
+            routeName: "eventList",
+          })
+        ]
+      });
+      this.props.navigation.dispatch(resetAction);
+    }
 }
 
 export default AuthScreen

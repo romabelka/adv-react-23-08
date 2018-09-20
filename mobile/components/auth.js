@@ -38,7 +38,12 @@ class Auth extends Component {
     }
 
     handleSubmit = () => {
-        this.props.onSignIn()
+        const {onSignIn, auth: { signInIntoFb, changeUser } } = this.props
+
+        signInIntoFb().then((res) => {
+          changeUser(res)
+          onSignIn()
+        })
     }
 }
 
