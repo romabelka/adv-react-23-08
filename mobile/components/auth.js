@@ -16,6 +16,7 @@ class Auth extends Component {
                 <View>
                     <Text style = {[styles.email, {fontSize: 20}]}>Email:</Text>
                     <TextInput
+                        autoCapitalize = "none"
                         style = {styles.input}
 //                        value={auth.email}
                         onChangeText={auth.changeEmail}
@@ -26,6 +27,7 @@ class Auth extends Component {
                 <View>
                     <Text>Password:</Text>
                     <TextInput
+                        autoCapitalize = "none"
                         style = {styles.input}
   //                      value = {auth.password}
                         onChangeText={auth.changePassword}
