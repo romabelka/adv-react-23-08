@@ -18,9 +18,10 @@ class EventList extends Component {
         }))
         return <SectionList
             sections = {sections}
+            keyExtractor={(item, index) => index}
             renderSectionHeader = {({section}) => <Text style={styles.header}>{section.title}</Text>}
             renderItem = {({item}) => <TouchableOpacity onPress = {() => this.handleEventPress(item.event)}>
-                    <EventCard event = {item.event} />
+                  <EventCard event = {item.event} />
                 </TouchableOpacity>
                 }
         />

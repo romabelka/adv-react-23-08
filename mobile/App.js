@@ -1,4 +1,5 @@
 import React from 'react'
+import './config'
 import {configure} from 'mobx'
 import {Provider} from 'mobx-react'
 import AppNavigator from './components/app-navigator'

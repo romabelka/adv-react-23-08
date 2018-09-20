@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
-import { StyleSheet} from 'react-native'
+import { Text, View, StyleSheet } from 'react-native'
 import EventList from '../events/event-list'
-import data from '../../fixtures'
-const eventList = Object.entries(data.events).map(([ id, event ]) => ({ id, ...event }))
+import Loader from '../common/loader'
+import { inject, observer } from "mobx-react";
 
+@inject('events')
+@observer
 class EventListScreen extends Component {
+
     static propTypes = {
 
     };
@@ -13,14 +16,16 @@ class EventListScreen extends Component {
         title: 'event list'
     }
 
-    render() {
-        return <EventList events = {eventList} />
+    componentDidMount () {
+      this.props.events.fetchEventsList()
     }
 
-//    handleEventPress = ({ id, title }) => this.props.navigation.navigate('event', { id, title })
+    render() {
+        const { events } = this.props
+        if (!events.isLoaded && events.isLoading) return <Loader />
+        return <EventList events = {events.eventList} />
+    }
 }
 
-const styles = StyleSheet.create({
-})
 
 export default EventListScreen
