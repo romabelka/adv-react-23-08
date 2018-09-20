@@ -38,7 +38,7 @@ class Auth extends Component {
     }
 
     handleSubmit = () => {
-        this.props.onSignIn()
+        this.props.auth.signIn();
     }
 }
 

@@ -3,6 +3,7 @@ import {configure} from 'mobx'
 import {Provider} from 'mobx-react'
 import AppNavigator from './components/app-navigator'
 import stores from './stores'
+import './config';
 
 configure({
     enforceActions: 'always'
