@@ -32,13 +32,31 @@ class Auth extends Component {
                         secureTextEntry
                     />
                 </View>
-                <Button title = "Sign In" onPress = {this.handleSubmit}/>
+                { auth.signInError && this.errorSection }
+                <Button
+                  disabled = {!auth.isSignInAvailable}
+                  title = "Sign In"
+                  onPress = {this.handleSubmit}
+                />
             </View>
         )
     }
 
     handleSubmit = () => {
-        this.props.onSignIn()
+      this.props.auth.signIn()
+        .then(() => {
+          !this.props.auth.signInError && this.props.onSignIn()
+        });
+    }
+    
+    get errorSection() {
+      return (
+        <View>
+          <Text style = {styles.error}>
+            Authentication failed. Try again
+          </Text>
+        </View>
+      )
     }
 }
 
@@ -61,6 +79,9 @@ const styles = {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-around'
+    },
+    error: {
+      color: 'red'
     }
 }
 

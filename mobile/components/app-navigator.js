@@ -1,7 +1,7 @@
 import {createStackNavigator} from 'react-navigation'
 import AuthScreen from './screens/auth'
-import EventScreen from './screens/event'
-import EventListScreen from './screens/event-list'
+import ListsScreen from './screens/lists'
+import EventScreen from './screens/event' 
 
 export default createStackNavigator({
     auth: {
@@ -10,10 +10,10 @@ export default createStackNavigator({
             title: 'Sign In'
         }
     },
-    event: {
-        screen: EventScreen
+    listsScreen: {
+        screen: ListsScreen
     },
-    eventList: {
-        screen: EventListScreen
-    }
+    event: { 
+        screen: EventScreen 
+    }, 
 })
