@@ -11,7 +11,7 @@ class AuthScreen extends Component {
   authenticatedDisposer = null
 
   onSuccessfulSignIn = () => {
-    this.props.navigation.navigate('eventList')
+    this.props.navigation.navigate('main')
   }
 
   componentDidMount() {

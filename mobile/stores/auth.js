@@ -8,10 +8,14 @@ class AuthStore {
   @observable
   password = ''
   @observable
-  loadingNewState = false
+  loadingNewState = true
   @observable
   user = null
   onAuthStateChangedDisposer = null
+
+  constructor() {
+    firebase.auth().onAuthStateChanged(this.onAuthStateChanged)
+  }
 
   @computed
   get isValidEmail() {
@@ -42,11 +46,6 @@ class AuthStore {
   @action
   signIn = () => {
     this.loadingNewState = true
-    if (!this.onAuthStateChangedDisposer) {
-      this.onAuthStateChangedDisposer = firebase
-        .auth()
-        .onAuthStateChanged(this.onAuthStateChanged)
-    }
     firebase.auth().signInWithEmailAndPassword(this.email, this.password)
   }
 }
