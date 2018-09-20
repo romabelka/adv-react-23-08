@@ -1,46 +1,62 @@
-import React, { Component } from 'react'
-import {Text, StyleSheet, SectionList, TouchableOpacity} from 'react-native'
-import {inject} from 'mobx-react'
-import EventCard from './event-card'
-import groupBy from 'lodash/groupBy'
+import React, { Component } from "react";
+import {
+  ActivityIndicator,
+  SectionList,
+  StyleSheet,
+  Text,
+  TouchableOpacity
+} from "react-native";
+import { inject, observer } from "mobx-react";
+import EventCard from "./event-card";
+import groupBy from "lodash/groupBy";
 
-@inject('navigation')
+@inject("navigation")
+@inject("events")
+@observer
 class EventList extends Component {
-    static propTypes = {
+  static propTypes = {};
 
-    };
+  render() {
+    const { events } = this.props;
+    const grouped = groupBy(events.entities, event => event.title.charAt(0));
+    const sections = Object.entries(grouped).map(([letter, list]) => ({
+      title: `${letter}, ${list.length} events`,
+      data: list.map(event => ({ key: event.id, event }))
+    }));
+    if (events.loading) return <ActivityIndicator />;
+    return (
+      <SectionList
+        sections={sections}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.header}>{section.title}</Text>
+        )}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => this.handleEventPress(item.event)}>
+            <EventCard event={item.event} />
+          </TouchableOpacity>
+        )}
+      />
+    );
+  }
 
-    render() {
-        const grouped = groupBy(this.props.events, event => event.title.charAt(0))
-        const sections = Object.entries(grouped).map(([letter, list]) => ({
-            title: `${letter}, ${list.length} events`,
-            data: list.map(event => ({key: event.id, event}))
-        }))
-        return <SectionList
-            sections = {sections}
-            renderSectionHeader = {({section}) => <Text style={styles.header}>{section.title}</Text>}
-            renderItem = {({item}) => <TouchableOpacity onPress = {() => this.handleEventPress(item.event)}>
-                    <EventCard event = {item.event} />
-                </TouchableOpacity>
-                }
-        />
-    }
-
-    handleEventPress = ({ id, title }) => this.props.navigation.goTo('event', { id, title })
+  handleEventPress = event => {
+    this.props.navigation.goTo("event", { id: event.id, title: event.title });
+  };
 }
 
 const styles = StyleSheet.create({
-    header: {
-        backgroundColor: '#F0F0F0',
-        height: 40,
-        lineHeight: 40,
-        marginBottom: 5,
-        shadowOffset: {
-            height: 2, width: 0
-        },
-        shadowOpacity: 0.3,
-        elevation: 3
-    }
-})
+  header: {
+    backgroundColor: "#F0F0F0",
+    height: 40,
+    lineHeight: 40,
+    marginBottom: 5,
+    shadowOffset: {
+      height: 2,
+      width: 0
+    },
+    shadowOpacity: 0.3,
+    elevation: 3
+  }
+});
 
-export default EventList
+export default EventList;

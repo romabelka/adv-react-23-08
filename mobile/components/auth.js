@@ -1,67 +1,78 @@
-import React, { Component } from 'react'
-import {View, Text, TextInput, Button, Platform} from 'react-native'
-import {observer, inject} from 'mobx-react'
+import React, { Component } from "react";
+import {
+  ActivityIndicator,
+  Button,
+  Platform,
+  Text,
+  TextInput,
+  View
+} from "react-native";
+import { inject, observer } from "mobx-react";
 
-@inject('auth')
+@inject("auth")
 @observer
 class Auth extends Component {
-    static propTypes = {
+  static propTypes = {};
 
-    };
-
-    render() {
-        const {auth} = this.props
-        return (
-            <View style = {styles.container}>
-                <View>
-                    <Text style = {[styles.email, {fontSize: 20}]}>Email:</Text>
-                    <TextInput
-                        style = {styles.input}
-//                        value={auth.email}
-                        onChangeText={auth.changeEmail}
-                        keyboardType="email-address"
-                    />
-                    <Text>email is {auth.isValidEmail ? 'valid' : 'invalid'}</Text>
-                </View>
-                <View>
-                    <Text>Password:</Text>
-                    <TextInput
-                        style = {styles.input}
-  //                      value = {auth.password}
-                        onChangeText={auth.changePassword}
-                        secureTextEntry
-                    />
-                </View>
-                <Button title = "Sign In" onPress = {this.handleSubmit}/>
-            </View>
-        )
-    }
-
-    handleSubmit = () => {
-        this.props.onSignIn()
-    }
+  render() {
+    const { auth } = this.props;
+    return (
+      <View style={styles.container}>
+        <View>
+          <Text style={[styles.email, { fontSize: 20 }]}>Email:</Text>
+          <TextInput
+            style={styles.input}
+            //                        value={auth.email}
+            onChangeText={auth.changeEmail}
+            keyboardType="email-address"
+          />
+          <Text>email is {auth.isValidEmail ? "valid" : "invalid"}</Text>
+        </View>
+        <View>
+          <Text>Password:</Text>
+          <TextInput
+            style={styles.input}
+            //                      value = {auth.password}
+            onChangeText={auth.changePassword}
+            secureTextEntry
+          />
+        </View>
+        <Text style={styles.error}>{auth.error}</Text>
+        {auth.loading ? (
+          <ActivityIndicator />
+        ) : (
+          <Button
+            disabled={auth.loading}
+            title="Sign In"
+            onPress={auth.signIn}
+          />
+        )}
+      </View>
+    );
+  }
 }
 
 const styles = {
-    email: {
-        color: 'red'
-    },
-    input: {
-        ...Platform.select({
-            ios: {
-                borderBottomWidth: 1,
-                borderBottomColor: '#000'
-            },
-            android: {
+  email: {
+    color: "red"
+  },
+  input: {
+    ...Platform.select({
+      ios: {
+        borderBottomWidth: 1,
+        borderBottomColor: "#000"
+      },
+      android: {}
+    })
+  },
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-around"
+  },
+  error: {
+    color: "red"
+  }
+};
 
-            }
-        })
-    },
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'space-around'
-    }
-}
-
-export default Auth
+export default Auth;
