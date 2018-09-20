@@ -1,7 +1,9 @@
-import AuthStore from './auth'
-import NavigationStore from './navigation'
+import AuthStore from './auth';
+import EventsStore from './events';
+import NavigationStore from './navigation';
 
 const navigation = new NavigationStore();
+const events = new EventsStore();
 
 /**
  * TOOD: Вопрос как лучше всего скомбинировать два стора? Т.e. в одном получать action другого.
@@ -9,5 +11,5 @@ const navigation = new NavigationStore();
 const auth = new AuthStore(navigation);
 
 export default {
-    auth, navigation
+    auth, navigation, events
 }
