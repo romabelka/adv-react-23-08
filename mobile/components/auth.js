@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Button, Platform, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  Platform,
+  Text,
+  TextInput,
+  View
+} from "react-native";
 import { inject, observer } from "mobx-react";
 
 @inject("auth")
@@ -31,7 +38,15 @@ class Auth extends Component {
           />
         </View>
         <Text style={styles.error}>{auth.error}</Text>
-        <Button disabled={auth.loading} title="Sign In" onPress={auth.signIn} />
+        {auth.loading ? (
+          <ActivityIndicator />
+        ) : (
+          <Button
+            disabled={auth.loading}
+            title="Sign In"
+            onPress={auth.signIn}
+          />
+        )}
       </View>
     );
   }
@@ -56,7 +71,7 @@ const styles = {
     justifyContent: "space-around"
   },
   error: {
-    color: 'red'
+    color: "red"
   }
 };
 

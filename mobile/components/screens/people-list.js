@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { StyleSheet} from 'react-native'
-import EventList from '../events/event-list'
+import PeopleList from '../people/people-list'
 
-class EventListScreen extends Component {
+class PeopleListScreen extends Component {
     static propTypes = {
 
     };
 
     render() {
-        return <EventList />
+        return <PeopleList />
     }
 
 //    handleEventPress = ({ id, title }) => this.props.navigation.navigate('event', { id, title })
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default EventListScreen
+export default PeopleListScreen

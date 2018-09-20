@@ -19,7 +19,7 @@ class AuthStore {
     constructor({navigation}) {
         autorun(() => {
             console.log('auth changed',this.isAuthorized);
-            if(this.isAuthorized) navigation.goTo('eventList');
+            if(this.isAuthorized) navigation.goTo('main');
         })
     }
 
