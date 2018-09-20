@@ -1,34 +1,34 @@
 import React, { Component } from 'react'
 import {View, Text, TextInput, Button, Platform} from 'react-native'
+import {observer, inject} from 'mobx-react'
 
+@inject('auth')
+@observer
 class Auth extends Component {
     static propTypes = {
 
     };
 
-    state = {
-        email: '',
-        password: ''
-    }
-
     render() {
+        const {auth} = this.props
         return (
             <View style = {styles.container}>
                 <View>
                     <Text style = {[styles.email, {fontSize: 20}]}>Email:</Text>
                     <TextInput
                         style = {styles.input}
-                        value={this.state.email}
-                        onChangeText={this.handleEmailChange}
+//                        value={auth.email}
+                        onChangeText={auth.changeEmail}
                         keyboardType="email-address"
                     />
+                    <Text>email is {auth.isValidEmail ? 'valid' : 'invalid'}</Text>
                 </View>
                 <View>
                     <Text>Password:</Text>
                     <TextInput
                         style = {styles.input}
-                        value = {this.state.password}
-                        onChangeText={this.handlePasswordChange}
+  //                      value = {auth.password}
+                        onChangeText={auth.changePassword}
                         secureTextEntry
                     />
                 </View>
@@ -37,11 +37,9 @@ class Auth extends Component {
         )
     }
 
-    handleSubmit = () => console.log('---', this.state)
-
-    handlePasswordChange = password => this.setState({ password })
-
-    handleEmailChange = email => this.setState({ email })
+    handleSubmit = () => {
+        this.props.onSignIn()
+    }
 }
 
 const styles = {
