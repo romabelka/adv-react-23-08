@@ -2,15 +2,13 @@ import React, { Component } from 'react'
 import Auth from '../auth'
 
 class AuthScreen extends Component {
-    static propTypes = {
+  static propTypes = {}
 
-    }
+  render() {
+    return <Auth onSignIn={this.handleSignIn} />
+  }
 
-    render() {
-        return <Auth onSignIn = {this.handleSignIn}/>
-    }
-
-    handleSignIn = () => this.props.navigation.navigate('eventList')
+  handleSignIn = () => this.props.navigation.navigate('eventList')
 }
 
 export default AuthScreen

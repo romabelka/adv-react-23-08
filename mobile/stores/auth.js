@@ -1,20 +1,27 @@
-import {observable, action, computed} from 'mobx'
-import {validate} from 'email-validator'
+import { observable, action, computed } from 'mobx'
+import { validate } from 'email-validator'
 
 class AuthStore {
-    @observable email = ''
-    @observable password = ''
+  @observable
+  email = ''
 
-    @computed get isValidEmail() {
-        return validate(this.email)
-    }
+  @observable
+  password = ''
 
-    @action changeEmail = email => {
-        this.email = email
-        this.email = ''
-        this.email = email
-    }
-    @action changePassword = password => this.password = password
+  @computed
+  get isValidEmail() {
+    return validate(this.email)
+  }
+
+  @action
+  changeEmail = (email) => {
+    this.email = email
+    this.email = ''
+    this.email = email
+  }
+
+  @action
+  changePassword = (password) => (this.password = password)
 }
 
 export default AuthStore

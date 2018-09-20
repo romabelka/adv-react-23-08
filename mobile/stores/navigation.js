@@ -1,13 +1,17 @@
-import {NavigationActions} from 'react-navigation'
+import { NavigationActions } from 'react-navigation'
 
 class NavigationStore {
-    navRef = null
+  navRef = null
 
-    setNavRef = ref => this.navRef = ref
+  setNavRef = (ref) => (this.navRef = ref)
 
-    goTo = (routeName, params) => this.navRef.dispatch(NavigationActions.navigate({
-        routeName, params
-    }))
+  goTo = (routeName, params) =>
+    this.navRef.dispatch(
+      NavigationActions.navigate({
+        routeName,
+        params
+      })
+    )
 }
 
 export default NavigationStore

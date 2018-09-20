@@ -5,5 +5,6 @@ const auth = new AuthStore()
 const navigation = new NavigationStore()
 
 export default {
-    auth, navigation
+  auth,
+  navigation
 }
