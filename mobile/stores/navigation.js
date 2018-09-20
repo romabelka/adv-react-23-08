@@ -5,7 +5,7 @@ class NavigationStore {
 
     setNavRef = ref => this.navRef = ref
 
-    goTo = (routeName, params) => this.navRef.dispatch(NavigationActions.navigate({
+    goTo = (routeName, params = {}) => this.navRef.dispatch(NavigationActions.navigate({
         routeName, params
     }))
 }

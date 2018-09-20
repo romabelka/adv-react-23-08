@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { StyleSheet} from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import EventList from '../events/event-list'
-import data from '../../fixtures'
-const eventList = Object.entries(data.events).map(([ id, event ]) => ({ id, ...event }))
+import { observer, inject } from 'mobx-react';
+import { LOADING_STATES } from '../../stores/events/constants';
 
+@inject('events')
+@observer
 class EventListScreen extends Component {
     static propTypes = {
 
@@ -13,8 +15,18 @@ class EventListScreen extends Component {
         title: 'event list'
     }
 
+    componentDidMount() {
+        this.props.events.getEvents()
+    }
+
     render() {
-        return <EventList events = {eventList} />
+        const { events } = this.props;
+
+        if (!events.state || events.state === LOADING_STATES.LOADING) {
+            return <View>loading...</View>;
+        }
+
+        return <EventList events = {events.events} />
     }
 
 //    handleEventPress = ({ id, title }) => this.props.navigation.navigate('event', { id, title })
