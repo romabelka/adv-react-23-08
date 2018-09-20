@@ -1,3 +1,5 @@
+import './config'
+
 import React from 'react'
 import { configure } from 'mobx'
 import { Provider } from 'mobx-react'
