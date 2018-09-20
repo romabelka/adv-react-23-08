@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import { inject } from 'mobx-react'
 import Event from '../events/event'
 import data from '../../fixtures'
 
+@inject('events')
 class EventScreen extends Component {
     static propTypes = {
 
@@ -12,7 +14,8 @@ class EventScreen extends Component {
     })
 
     render() {
-        const event = data.events[this.props.navigation.state.params.id]
+        const eventId = this.props.navigation.state.params.id;
+        const event = this.props.events.events.find(item => item.id === eventId)
         return <Event event = {event}/>
     }
 }
