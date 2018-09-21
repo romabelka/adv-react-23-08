@@ -1,8 +1,9 @@
 import React from 'react'
 import {configure} from 'mobx'
+import {View } from 'react-native'
 import {Provider} from 'mobx-react'
-import AppNavigator from './components/app-navigator'
-import stores from './stores'
+import AppNavigator from './src/components/app-navigator'
+import stores from './src/stores'
 
 configure({
     enforceActions: 'always'

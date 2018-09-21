@@ -17,8 +17,8 @@ class Auth extends Component {
                     <Text style = {[styles.email, {fontSize: 20}]}>Email:</Text>
                     <TextInput
                         style = {styles.input}
-//                        value={auth.email}
-                        onChangeText={auth.changeEmail}
+                        value={auth.email}
+                        onChangeText={auth.setEmail}
                         keyboardType="email-address"
                     />
                     <Text>email is {auth.isValidEmail ? 'valid' : 'invalid'}</Text>
@@ -27,8 +27,8 @@ class Auth extends Component {
                     <Text>Password:</Text>
                     <TextInput
                         style = {styles.input}
-  //                      value = {auth.password}
-                        onChangeText={auth.changePassword}
+                        value = {auth.password}
+                        onChangeText={auth.setPassword}
                         secureTextEntry
                     />
                 </View>
@@ -37,9 +37,7 @@ class Auth extends Component {
         )
     }
 
-    handleSubmit = () => {
-        this.props.onSignIn()
-    }
+    handleSubmit = this.props.auth.signIn
 }
 
 const styles = {
