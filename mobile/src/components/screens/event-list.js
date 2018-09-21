@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {observer, inject} from 'mobx-react'
+import {observer, inject, Observer} from 'mobx-react'
 import {View, StyleSheet, ActivityIndicator} from 'react-native'
 import EventList from '../events/event-list'
 

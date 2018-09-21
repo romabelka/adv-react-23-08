@@ -12,14 +12,19 @@ class NavigationStore extends BasicStore {
 
     onReady = () => {
         let firstRun = true
-        autorun(() => {
-            const screen = this.getStore('auth').user
-                ? 'lists'
-                : 'auth'
 
-            if (!firstRun) this.reset(screen)
-            firstRun = false
+        setTimeout(() => {
+            autorun(() => {
+                const screen = this.getStore('auth').user
+                    ? 'lists'
+                    : 'auth'
+
+                if (!firstRun) {
+                    this.reset(screen)
+                }
+                firstRun = false
         })
+        }, 0)
     }
 
     goTo = (routeName, params) => this.ref.dispatch(NavigationActions.navigate({
