@@ -1,19 +1,19 @@
 import React, { Component } from 'react'
 import { StyleSheet } from 'react-native'
-import EventList from '../events/event-list'
+import PersonList from '../people/person-list'
 
-class EventListScreen extends Component {
+class PersonListScreen extends Component {
   static propTypes = {}
 
   static navigationOptions = {
-    title: 'event list'
+    title: 'person list'
   }
 
   render() {
-    return <EventList />
+    return <PersonList />
   }
 }
 
 const styles = StyleSheet.create({})
 
-export default EventListScreen
+export default PersonListScreen

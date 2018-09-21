@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { inject } from 'mobx-react'
-import Event from '../events/event'
+import Person from '../people/person'
 
-@inject('events')
-class EventScreen extends Component {
+@inject('people')
+class PersonScreen extends Component {
   static propTypes = {}
 
   static navigationOptions = ({ navigation }) => ({
@@ -11,12 +11,12 @@ class EventScreen extends Component {
   })
 
   render() {
-    const event = this.props.events.entities[
+    const person = this.props.people.entities[
       this.props.navigation.state.params.id
     ]
 
-    return <Event event={event} />
+    return <Person person={person} />
   }
 }
 
-export default EventScreen
+export default PersonScreen

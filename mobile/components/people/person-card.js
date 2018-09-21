@@ -6,10 +6,10 @@ class EventCard extends Component {
   static propTypes = {}
 
   render() {
-    const { event } = this.props
+    const { person } = this.props
     return (
       <Card>
-        <Text>{event.title}</Text>
+        <Text>{person.email}</Text>
       </Card>
     )
   }
