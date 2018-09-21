@@ -10,7 +10,7 @@ class AuthScreen extends Component {
 
   handleSignIn = () => {
     // this.props.navigation.navigate('eventList')
-    this.props.navigation.replace('eventList')
+    this.props.navigation.replace('tabs')
   }
 }
 

@@ -8,41 +8,40 @@ import {
 } from 'react-native'
 import { inject, observer } from 'mobx-react'
 
-import EventCard from './event-card'
+import PersonCard from './person-card'
 
-@inject('navigation', 'events')
+@inject('navigation', 'people')
 @observer
-class EventList extends Component {
+class PersonList extends Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.props.events.fetchAll()
+    this.props.people.fetchAll()
   }
 
   render() {
-    const { events } = this.props
+    const { people } = this.props
 
-    if (!events.sectionList || events.loading) {
+    if (!people.sectionList || people.loading) {
       return <ActivityIndicator style={StyleSheet.absoluteFill} size="large" />
     }
 
     return (
       <SectionList
-        sections={events.sectionList}
+        sections={people.sectionList}
         renderSectionHeader={({ section }) => (
           <Text style={styles.header}>{section.title}</Text>
         )}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => this.handleEventPress(item.event)}>
-            <EventCard event={item.event} />
+          <TouchableOpacity onPress={() => this.handlePersonPress(item.person)}>
+            <PersonCard person={item.person} />
           </TouchableOpacity>
         )}
       />
     )
   }
 
-  handleEventPress = ({ id, title }) =>
-    this.props.navigation.goTo('event', { id, title })
+  handlePersonPress = ({ id }) => this.props.navigation.goTo('person', { id })
 }
 
 const styles = StyleSheet.create({
@@ -60,4 +59,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default EventList
+export default PersonList
