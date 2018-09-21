@@ -10,7 +10,6 @@ class AuthScreen extends Component {
         return <Auth onSignIn = {this.handleSignIn}/>
     }
 
-    handleSignIn = () => this.props.navigation.navigate('eventList')
 }
 
 export default AuthScreen

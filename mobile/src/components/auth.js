@@ -32,12 +32,10 @@ class Auth extends Component {
                         secureTextEntry
                     />
                 </View>
-                <Button title = "Sign In" onPress = {this.handleSubmit}/>
+                <Button title = "Sign In" onPress = {this.props.auth.signIn}/>
             </View>
         )
     }
-
-    handleSubmit = this.props.auth.signIn
 }
 
 const styles = {
