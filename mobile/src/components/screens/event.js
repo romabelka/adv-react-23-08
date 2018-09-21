@@ -13,7 +13,7 @@ class EventScreen extends Component {
     }
 
     render() {
-        return <Event event = {this.props.events.entities[this.props.navigation.state.params.uid]}/>
+        return <Event event = {this.props.events.entities[this.props.navigation.state.params.id]}/>
     }
 }
 
