@@ -1,31 +1,40 @@
 import React, { Component } from 'react'
-import {observer, inject} from 'mobx-react'
-import {View, ActivityIndicator} from 'react-native'
+import { observer, inject } from 'mobx-react'
+import { View, ActivityIndicator, Button } from 'react-native'
 import PeopleList from '../people/people-list'
+import AvatarPictureTaker from '../people/avatar-picture-taker'
 
-@inject('people') @observer
+@inject('people')
+@observer
 class PeopleListScreen extends Component {
-    static propTypes = {
+  static propTypes = {}
 
-    };
+  static navigationOptions = {
+    title: 'People List'
+  }
 
-    static navigationOptions = {
-        title: 'People List'
-    }
+  componentDidMount() {
+    this.props.people.checkAndLoadAll()
+  }
 
-    componentDidMount() {
-        this.props.people.checkAndLoadAll()
-    }
+  render() {
+    const { people } = this.props
+    if (people.loading) return this.loader
+    return (
+      <View>
+        <AvatarPictureTaker />
+        <PeopleList />
+      </View>
+    )
+  }
 
-    render() {
-        const {people} = this.props
-        if (people.loading) return this.loader
-        return <PeopleList />
-    }
-
-    get loader() {
-        return <View><ActivityIndicator size='large'/></View>
-    }
+  get loader() {
+    return (
+      <View>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
 }
 
 export default PeopleListScreen
