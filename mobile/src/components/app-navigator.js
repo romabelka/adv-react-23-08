@@ -4,6 +4,7 @@ import EventList from './screens/event-list'
 import PeopleList from './screens/people-list'
 import EventScreen from './screens/event'
 import EventMapScreen from './screens/event-map'
+import PersonPhoto from './screens/person-photo'
 
 const ListsNavigator = createBottomTabNavigator({
     events: {
@@ -21,6 +22,9 @@ export default createStackNavigator({
         navigationOptions: {
             title: 'Sign In'
         }
+    },
+    personPhoto: {
+        screen: PersonPhoto
     },
     lists: {
         screen: ListsNavigator

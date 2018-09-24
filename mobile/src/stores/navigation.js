@@ -37,6 +37,8 @@ class NavigationStore extends BasicStore {
             NavigationActions.navigate({ routeName })
         ]
     }))
+
+    goBack = () => this.ref.dispatch(NavigationActions.back())
 }
 
 export default NavigationStore

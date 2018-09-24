@@ -3,7 +3,7 @@ import {inject, observer} from 'mobx-react'
 import {TouchableOpacity, Text, SectionList, ActivityIndicator, StyleSheet} from 'react-native'
 import PersonCard from './person-card'
 
-@inject('people')
+@inject('people', 'navigation')
 @observer
 class PeopleList extends Component {
     static defaultProps = {
@@ -16,17 +16,19 @@ class PeopleList extends Component {
     }
 
     render() {
-        const {onPersonPress, people} = this.props
+        const {people} = this.props
         if (people.loading) return <ActivityIndicator size='large'/>
 
         return <SectionList
             sections = {people.sections}
             renderSectionHeader = {({section}) => <Text style={styles.header}>{section.title}</Text>}
-            renderItem = {({item}) => <TouchableOpacity onPress = {onPersonPress.bind(null, item.key)}>
+            renderItem = {({item}) => <TouchableOpacity onPress = {this.handlePress(item.key)}>
                 <PersonCard person = {item.person} />
             </TouchableOpacity>}
         />
     }
+
+    handlePress = (id) => () => this.props.navigation.goTo('personPhoto', { id })
 }
 
 const styles = StyleSheet.create({
